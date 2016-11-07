@@ -1,9 +1,12 @@
 module Model exposing (..)
 
+import Dict exposing (Dict)
 
-type alias Model = Int
+import Types exposing (Post, Comment)
 
 
-model : Model
-model =
-  0
+type alias Model =
+  { posts : List Post
+  , comments: Dict String (List Comment)
+  , likes: Int
+  }

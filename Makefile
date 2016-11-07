@@ -1,11 +1,12 @@
 cc = elm make
 src = src
 dist = dist
+public = public
 main = $(src)/Main.elm
 output = $(dist)/elm.js
 index = index.html
 
-dist : clean install copy
+build : install clean copy
 	$(cc) $(main) --output $(output)
 
 run : dist
@@ -16,7 +17,7 @@ clean :
 	mkdir $(dist)
 
 copy :
-	cp $(src)/$(index) $(dist)/$(index)
+	cp -R $(public)/* $(dist)
 
 install :
 	elm package install -y
