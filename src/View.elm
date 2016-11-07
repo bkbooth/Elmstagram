@@ -5,12 +5,11 @@ import Html.Attributes exposing (type')
 import Html.Events exposing (onClick)
 import Dict
 
-import Types exposing (Msg(..))
-import Model exposing (Model)
+import Types exposing (Model, Msg(..))
 
 
-view : Model -> Html Msg
-view model =
+rootView : Model -> Html Msg
+rootView model =
   div []
     [ h1 [] [text "Elmstagram"]
     , p [] [text "This is just a clone of Instagram"]

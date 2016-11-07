@@ -2,12 +2,12 @@ cc = elm make
 src = src
 dist = dist
 public = public
-main = $(src)/Main.elm
+entry = $(src)/App.elm
 output = $(dist)/elm.js
 index = index.html
 
 build : install clean copy
-	$(cc) $(main) --output $(output)
+	$(cc) $(entry) --output $(output)
 
 run : dist
 	open $(dist)/$(index)

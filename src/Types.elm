@@ -2,7 +2,13 @@ module Types exposing (..)
 
 import Dict exposing (Dict)
 import Http
-import Json.Decode as Json exposing (..)
+
+
+type alias Model =
+  { posts : List Post
+  , comments: Dict String (List Comment)
+  , likes: Int
+  }
 
 
 type Msg
@@ -25,22 +31,3 @@ type alias Comment =
   { text: String
   , user: String
   }
-
-
-decodePosts : Json.Decoder (List Post)
-decodePosts =
-  ( object5 Post
-    ("code" := string)
-    ("caption" := string)
-    ("likes" := int)
-    ("id" := string)
-    ("display_src" := string)
-  ) |> list
-
-
-decodeComments : Json.Decoder (Dict String (List Comment))
-decodeComments =
-  ( object2 Comment
-    ("text" := string)
-    ("user" := string)
-  ) |> list |> dict
