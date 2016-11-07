@@ -1,4 +1,4 @@
-module Elmstagram exposing (..)
+module Main exposing (..)
 
 
 -- IMPORTS
