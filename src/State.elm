@@ -25,24 +25,16 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update action model =
   case action of
     FetchPostsSuccess posts ->
-      ( { model | posts = posts }
-      , Rest.getData FetchFail FetchCommentsSuccess Rest.decodeComments "data/comments.json"
-      )
+      { model | posts = posts } ! []
 
     FetchCommentsSuccess comments ->
-      ( { model | comments = comments }
-      , Cmd.none
-      )
+      { model | comments = comments } ! []
 
     FetchFail _ ->
-      ( model
-      , Cmd.none
-      )
+      model ! []
 
     IncrementLikes code ->
-      ( { model | posts = List.map (incrementPostLikes code) model.posts }
-      , Cmd.none
-      )
+      { model | posts = List.map (incrementPostLikes code) model.posts } ! []
 
 
 incrementPostLikes : String -> Post -> Post
@@ -59,12 +51,15 @@ urlUpdate : Result String Page -> Model -> ( Model, Cmd Msg )
 urlUpdate result model =
   case result of
     Ok page ->
-      ( { model | page = page }
-      , Rest.getData FetchFail FetchPostsSuccess Rest.decodePosts "data/posts.json"
-      )
+      { model | page = page } !
+        [ Rest.getData FetchFail FetchPostsSuccess Rest.decodePosts "data/posts.json"
+        , Rest.getData FetchFail FetchCommentsSuccess Rest.decodeComments "data/comments.json"
+        ]
 
     Err _ ->
-      ( model, Navigation.modifyUrl (toURL model.page) )
+      model !
+        [ Navigation.modifyUrl (toURL model.page)
+        ]
 
 
 toURL : Page -> String
