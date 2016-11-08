@@ -7,6 +7,7 @@ import Http
 type alias Model =
   { posts : List Post
   , comments: Dict String (List Comment)
+  , page: Page
   }
 
 
@@ -15,6 +16,11 @@ type Msg
   | FetchCommentsSuccess (Dict String (List Comment))
   | FetchFail Http.Error
   | IncrementLikes String
+
+
+type Page
+  = Photos
+  | Photo String
 
 
 type alias Post =
