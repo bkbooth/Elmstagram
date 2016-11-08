@@ -27,7 +27,17 @@ viewPage model =
         (List.map viewPost model.posts)
 
     Photo code ->
-      div [ class "photo-single" ] [ text code ]
+      let
+        post = List.head (List.filter (\p -> p.code == code) model.posts)
+      in
+        case post of
+          Just post ->
+            div [ class "single-photo" ]
+              [ (viewPost post)
+              ]
+
+          Nothing ->
+            div [] []
 
 
 viewPost : Post -> Html Msg
