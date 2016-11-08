@@ -3,9 +3,9 @@ module View exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
-import Dict
+import Dict exposing (Dict)
 
-import Types exposing (Model, Msg(..), Page(..), Post)
+import Types exposing (Model, Msg(..), Page(..), Post, Comment)
 import State
 
 
@@ -24,24 +24,36 @@ viewPage model =
   case model.page of
     Photos ->
       div [ class "photo-grid" ]
-        (List.map viewPost model.posts)
+        (List.map (viewPost model) model.posts)
 
     Photo code ->
       let
-        post = List.head (List.filter (\p -> p.code == code) model.posts)
+        post = getPost code model.posts
       in
         case post of
           Just post ->
             div [ class "single-photo" ]
-              [ (viewPost post)
+              [ (viewPost model post)
               ]
 
           Nothing ->
             div [] []
 
 
-viewPost : Post -> Html Msg
-viewPost post =
+getPost : String -> List Post -> Maybe Post
+getPost code posts =
+  let
+    filterByCode : Post -> Bool
+    filterByCode post =
+      post.code == code
+
+    postsByCode = List.filter filterByCode posts
+  in
+    List.head postsByCode
+
+
+viewPost : Model -> Post -> Html Msg
+viewPost model post =
   figure [ class "grid-figure" ]
     [ div [ class "grid-photo-wrap" ]
       [ a [ href (State.toURL (Photo post.code)) ]
@@ -56,9 +68,28 @@ viewPost post =
         , a [ href (State.toURL (Photo post.code)), class "button" ]
           [ span [ class "comment-count" ]
             [ span [ class "speech-bubble" ] []
-            , text (" " ++ "0")
+            , text (" " ++ (viewCommentsCount (getPostComments post.code model.comments)))
             ]
           ]
         ]
       ]
     ]
+
+
+getPostComments : String -> Dict String (List Comment) -> Maybe (List Comment)
+getPostComments code comments =
+  Dict.get code comments
+
+
+viewCommentsCount : Maybe (List Comment) -> String
+viewCommentsCount comments =
+  let
+    commentsCount =
+      case comments of
+        Just comments ->
+          List.length comments
+
+        Nothing ->
+          0
+  in
+    toString commentsCount
