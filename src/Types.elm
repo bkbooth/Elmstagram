@@ -7,13 +7,11 @@ import Http
 type alias Model =
   { posts : List Post
   , comments: Dict String (List Comment)
-  , likes: Int
   }
 
 
 type Msg
-  = IncrementLikes
-  | FetchPostsSuccess (List Post)
+  = FetchPostsSuccess (List Post)
   | FetchCommentsSuccess (Dict String (List Comment))
   | FetchFail Http.Error
 

@@ -11,7 +11,7 @@ import Rest
 
 init : ( Model, Cmd Msg )
 init =
-  ( Model [] Dict.empty 0
+  ( Model [] Dict.empty
   , Rest.getData FetchFail FetchPostsSuccess Rest.decodePosts "data/posts.json"
   )
 
@@ -19,11 +19,6 @@ init =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update action model =
   case action of
-    IncrementLikes ->
-      ( { model | likes = model.likes + 1 }
-      , Cmd.none
-      )
-
     FetchPostsSuccess posts ->
       ( { model | posts = posts }
       , Rest.getData FetchFail FetchCommentsSuccess Rest.decodeComments "data/comments.json"
