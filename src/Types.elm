@@ -14,6 +14,7 @@ type Msg
   = FetchPostsSuccess (List Post)
   | FetchCommentsSuccess (Dict String (List Comment))
   | FetchFail Http.Error
+  | IncrementLikes String
 
 
 type alias Post =

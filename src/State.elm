@@ -5,7 +5,7 @@ import Task
 import Http
 import Json.Decode as Json
 
-import Types exposing (Model, Msg(..))
+import Types exposing (Model, Msg(..), Post)
 import Rest
 
 
@@ -34,7 +34,20 @@ update action model =
       , Cmd.none
       )
 
+    IncrementLikes code ->
+      ( { model | posts = List.map (incrementPostLikes code) model.posts }
+      , Cmd.none
+      )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.none
+
+
+incrementPostLikes : String -> Post -> Post
+incrementPostLikes code post =
+  if post.code == code then
+    { post | likes = post.likes + 1 }
+  else
+    post

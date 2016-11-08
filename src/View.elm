@@ -31,7 +31,7 @@ viewPost post =
     , figcaption []
       [ p [] [ text post.caption ]
       , div [ class "control-buttons" ]
-        [ button [ class "likes" ] [ text ("♥ " ++ (toString post.likes)) ]
+        [ button [ onClick (IncrementLikes post.code), class "likes" ] [ text ("♥ " ++ (toString post.likes)) ]
         , a [ href ("/view/" ++ post.code), class "button" ]
           [ span [ class "comment-count" ]
             [ span [ class "speech-bubble" ] []
