@@ -34,6 +34,7 @@ viewPage model =
           Just post ->
             div [ class "single-photo" ]
               [ (viewPost model post)
+              , (viewComments model (getPostComments post.code model.comments))
               ]
 
           Nothing ->
@@ -79,6 +80,41 @@ viewPost model post =
 getPostComments : String -> Dict String (List Comment) -> Maybe (List Comment)
 getPostComments code comments =
   Dict.get code comments
+
+
+viewComments : Model -> Maybe (List Comment) -> Html Msg
+viewComments model comments =
+  let
+    listOfComments =
+      case comments of
+        Just comments ->
+          List.map (viewComment model) comments
+
+        Nothing ->
+          []
+  in
+    div [ class "comments" ]
+    (listOfComments ++ [ (viewCommentsForm model) ])
+
+
+viewComment : Model -> Comment -> Html Msg
+viewComment model comment =
+  div [ class "comment" ]
+  [ p []
+    [ strong [] [ text comment.user ]
+    , text comment.text
+    , button [ class "remove-comment" ] [ text "×" ]
+    ]
+  ]
+
+
+viewCommentsForm : Model -> Html Msg
+viewCommentsForm model =
+  Html.form [ class "comment-form" ]
+  [ input [ type' "text", placeholder "author" ] []
+  , input [ type' "text", placeholder "comment" ] []
+  , input [ type' "submit", hidden True ] []
+  ]
 
 
 viewCommentsCount : Maybe (List Comment) -> String
