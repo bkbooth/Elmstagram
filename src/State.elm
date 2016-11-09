@@ -2,13 +2,11 @@ module State exposing (..)
 
 import String
 import Dict
-import Task
-import Http
-import Json.Decode as Json
+import List.Extra
 import Navigation
 import UrlParser exposing (..)
 
-import Types exposing (Model, Msg(..), Post, Page(..))
+import Types exposing (..)
 import Rest
 
 
@@ -34,15 +32,32 @@ update action model =
       model ! []
 
     IncrementLikes code ->
-      { model | posts = List.map (incrementPostLikes code) model.posts } ! []
+      let
+        incrementPostLikes : String -> Post -> Post
+        incrementPostLikes code post =
+          if post.code == code then
+            { post | likes = post.likes + 1 }
+          else
+            post
 
+        updatedPosts = List.map (incrementPostLikes code) model.posts
+      in
+        { model | posts = updatedPosts } ! []
 
-incrementPostLikes : String -> Post -> Post
-incrementPostLikes code post =
-  if post.code == code then
-    { post | likes = post.likes + 1 }
-  else
-    post
+    RemoveComment code index ->
+      let
+        updatePostComments : Maybe (List Comment) -> Maybe (List Comment)
+        updatePostComments comments =
+          case comments of
+            Just comments ->
+              Just (List.Extra.removeAt index comments)
+
+            Nothing ->
+              Nothing
+
+        updatedComments = Dict.update code updatePostComments model.comments
+      in
+        { model | comments = updatedComments } ! []
 
 
 -- URL UPDATE

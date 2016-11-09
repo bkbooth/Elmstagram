@@ -5,7 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Dict exposing (Dict)
 
-import Types exposing (Model, Msg(..), Page(..), Post, Comment)
+import Types exposing (..)
 import State
 
 
@@ -34,7 +34,7 @@ viewPage model =
           Just post ->
             div [ class "single-photo" ]
               [ (viewPost model post)
-              , (viewComments model (getPostComments post.code model.comments))
+              , (viewComments post.code (getPostComments post.code model.comments))
               ]
 
           Nothing ->
@@ -82,34 +82,34 @@ getPostComments code comments =
   Dict.get code comments
 
 
-viewComments : Model -> Maybe (List Comment) -> Html Msg
-viewComments model comments =
+viewComments : String -> Maybe (List Comment) -> Html Msg
+viewComments code comments =
   let
     listOfComments =
       case comments of
         Just comments ->
-          List.map (viewComment model) comments
+          List.indexedMap (viewComment code) comments
 
         Nothing ->
           []
   in
     div [ class "comments" ]
-    (listOfComments ++ [ (viewCommentsForm model) ])
+    (listOfComments ++ [ (viewCommentsForm code) ])
 
 
-viewComment : Model -> Comment -> Html Msg
-viewComment model comment =
+viewComment : String -> Int -> Comment -> Html Msg
+viewComment code index comment =
   div [ class "comment" ]
   [ p []
     [ strong [] [ text comment.user ]
     , text comment.text
-    , button [ class "remove-comment" ] [ text "×" ]
+    , button [ onClick (RemoveComment code index), class "remove-comment" ] [ text "×" ]
     ]
   ]
 
 
-viewCommentsForm : Model -> Html Msg
-viewCommentsForm model =
+viewCommentsForm : String -> Html Msg
+viewCommentsForm code =
   Html.form [ class "comment-form" ]
   [ input [ type' "text", placeholder "author" ] []
   , input [ type' "text", placeholder "comment" ] []

@@ -16,6 +16,7 @@ type Msg
   | FetchCommentsSuccess (Dict String (List Comment))
   | FetchFail Http.Error
   | IncrementLikes String
+  | RemoveComment String Int
 
 
 type Page
