@@ -12,6 +12,11 @@ type alias Model =
   }
 
 
+initialModel : Page -> Model
+initialModel page =
+  Model [] Dict.empty page (Comment "" "")
+
+
 type Msg
   = FetchPostsSuccess (List Post)
   | FetchCommentsSuccess (Dict String (List Comment))

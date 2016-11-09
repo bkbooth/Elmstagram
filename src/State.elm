@@ -14,7 +14,13 @@ import Rest
 
 init : Result String Page -> ( Model, Cmd Msg )
 init result =
-  urlUpdate result (Model [] Dict.empty Photos (Comment "" ""))
+  let
+    model = initialModel (pageFromResult result)
+  in
+    model !
+      [ Rest.getData FetchFail FetchPostsSuccess Rest.decodePosts "data/posts.json"
+      , Rest.getData FetchFail FetchCommentsSuccess Rest.decodeComments "data/comments.json"
+      ]
 
 
 -- UPDATE
@@ -96,17 +102,20 @@ update action model =
 
 urlUpdate : Result String Page -> Model -> ( Model, Cmd Msg )
 urlUpdate result model =
+  let
+    page = pageFromResult result
+  in
+    { model | page = page } ! []
+
+
+pageFromResult : Result String Page -> Page
+pageFromResult result =
   case result of
     Ok page ->
-      { model | page = page } !
-        [ Rest.getData FetchFail FetchPostsSuccess Rest.decodePosts "data/posts.json"
-        , Rest.getData FetchFail FetchCommentsSuccess Rest.decodeComments "data/comments.json"
-        ]
+      page
 
     Err _ ->
-      model !
-        [ Navigation.modifyUrl (toURL model.page)
-        ]
+      Photos
 
 
 toURL : Page -> String
