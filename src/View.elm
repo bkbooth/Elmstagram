@@ -2,7 +2,7 @@ module View exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Dict exposing (Dict)
 
 import Types exposing (..)
@@ -34,7 +34,7 @@ viewPage model =
           Just post ->
             div [ class "single-photo" ]
               [ (viewPost model post)
-              , (viewComments post.code (getPostComments post.code model.comments))
+              , (viewComments model post.code (getPostComments post.code model.comments))
               ]
 
           Nothing ->
@@ -82,8 +82,8 @@ getPostComments code comments =
   Dict.get code comments
 
 
-viewComments : String -> Maybe (List Comment) -> Html Msg
-viewComments code comments =
+viewComments : Model -> String -> Maybe (List Comment) -> Html Msg
+viewComments model code comments =
   let
     listOfComments =
       case comments of
@@ -94,7 +94,7 @@ viewComments code comments =
           []
   in
     div [ class "comments" ]
-    (listOfComments ++ [ (viewCommentsForm code) ])
+    (listOfComments ++ [ (viewCommentsForm model code) ])
 
 
 viewComment : String -> Int -> Comment -> Html Msg
@@ -108,12 +108,25 @@ viewComment code index comment =
   ]
 
 
-viewCommentsForm : String -> Html Msg
-viewCommentsForm code =
-  Html.form [ class "comment-form" ]
-  [ input [ type' "text", placeholder "author" ] []
-  , input [ type' "text", placeholder "comment" ] []
-  , input [ type' "submit", hidden True ] []
+viewCommentsForm : Model -> String -> Html Msg
+viewCommentsForm model code =
+  Html.form [ onSubmit (AddComment code model.comment), class "comment-form" ]
+  [ input
+    [ type' "text"
+    , value model.comment.user
+    , onInput UpdateCommentUser
+    , placeholder "author"
+    ] []
+  , input
+    [ type' "text"
+    , value model.comment.text
+    , onInput UpdateCommentText
+    , placeholder "comment"
+    ] []
+  , input
+    [ type' "submit"
+    , hidden True
+    ] []
   ]
 
 

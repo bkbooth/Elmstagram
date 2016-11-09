@@ -14,7 +14,7 @@ import Rest
 
 init : Result String Page -> ( Model, Cmd Msg )
 init result =
-  urlUpdate result (Model [] Dict.empty Photos)
+  urlUpdate result (Model [] Dict.empty Photos (Comment "" ""))
 
 
 -- UPDATE
@@ -43,6 +43,38 @@ update action model =
         updatedPosts = List.map (incrementPostLikes code) model.posts
       in
         { model | posts = updatedPosts } ! []
+
+    UpdateCommentUser user ->
+      let
+        comment = model.comment
+        updatedComment = { comment | user = user }
+      in
+        { model | comment = updatedComment } ! []
+
+    UpdateCommentText text ->
+      let
+        comment = model.comment
+        updatedComment = { comment | text = text }
+      in
+        { model | comment = updatedComment } ! []
+
+    AddComment code comment ->
+      let
+        addPostComment : Maybe (List Comment) -> Maybe (List Comment)
+        addPostComment comments =
+          case comments of
+            Just comments ->
+              Just (comments ++ [ comment ])
+
+            Nothing ->
+              Nothing
+
+        updatedComments = Dict.update code addPostComment model.comments
+      in
+        { model
+          | comments = updatedComments
+          , comment = Comment "" ""
+          } ! []
 
     RemoveComment code index ->
       let

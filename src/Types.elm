@@ -8,6 +8,7 @@ type alias Model =
   { posts : List Post
   , comments: Dict String (List Comment)
   , page: Page
+  , comment: Comment
   }
 
 
@@ -16,6 +17,9 @@ type Msg
   | FetchCommentsSuccess (Dict String (List Comment))
   | FetchFail Http.Error
   | IncrementLikes String
+  | UpdateCommentUser String
+  | UpdateCommentText String
+  | AddComment String Comment
   | RemoveComment String Int
 
 
