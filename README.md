@@ -12,9 +12,9 @@ $ make
 
 ## Run
 
-After building use a static file server to host the `dist` directory.
-Alternatively just open `dist/index.html` in your browser.
+After building, use a simple HTTP server to serve the `dist` directory.
 
 ```bash
-$ make run
+$ npm install -g http-server
+$ http-server dist
 ```

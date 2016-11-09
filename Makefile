@@ -9,9 +9,6 @@ index = index.html
 build : install clean copy
 	$(cc) $(entry) --output $(output)
 
-run : dist
-	open $(dist)/$(index)
-
 clean :
 	rm -rf $(dist)
 	mkdir $(dist)
