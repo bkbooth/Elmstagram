@@ -12,7 +12,7 @@ import Rest
 
 -- INIT
 
-init : Result String Page -> ( Model, Cmd Msg )
+init : Result String Page -> (Model, Cmd Msg)
 init result =
   let
     model = initialModel (pageFromResult result)
@@ -25,7 +25,7 @@ init result =
 
 -- UPDATE
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
   case action of
     FetchPostsSuccess posts ->
@@ -84,8 +84,8 @@ update action model =
 
     RemoveComment code index ->
       let
-        updatePostComments : Maybe (List Comment) -> Maybe (List Comment)
-        updatePostComments comments =
+        removePostComment : Maybe (List Comment) -> Maybe (List Comment)
+        removePostComment comments =
           case comments of
             Just comments ->
               Just (List.Extra.removeAt index comments)
@@ -93,14 +93,14 @@ update action model =
             Nothing ->
               Nothing
 
-        updatedComments = Dict.update code updatePostComments model.comments
+        updatedComments = Dict.update code removePostComment model.comments
       in
         { model | comments = updatedComments } ! []
 
 
 -- URL UPDATE
 
-urlUpdate : Result String Page -> Model -> ( Model, Cmd Msg )
+urlUpdate : Result String Page -> Model -> (Model, Cmd Msg)
 urlUpdate result model =
   let
     page = pageFromResult result
@@ -121,7 +121,7 @@ pageFromResult result =
 toURL : Page -> String
 toURL page =
   let
-    baseUrl = "/#/"
+    baseUrl = "#/"
   in
     case page of
       Photos ->
@@ -134,7 +134,7 @@ toURL page =
 -- TODO: use location.pathname instead
 hashParser : Navigation.Location -> Result String Page
 hashParser location =
-  UrlParser.parse identity pageParser (String.dropLeft 2 (Debug.log "hash" location.hash))
+  UrlParser.parse identity pageParser (String.dropLeft 2 location.hash)
 
 
 pageParser : Parser (Page -> a) a

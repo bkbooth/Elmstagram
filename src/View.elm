@@ -29,12 +29,13 @@ viewPage model =
     Photo code ->
       let
         post = getPost code model.posts
+        postComments = getPostComments code model.comments
       in
         case post of
           Just post ->
             div [ class "single-photo" ]
               [ (viewPost model post)
-              , (viewComments model post.code (getPostComments post.code model.comments))
+              , (viewComments model post.code postComments)
               ]
 
           Nothing ->
@@ -44,101 +45,85 @@ viewPage model =
 getPost : String -> List Post -> Maybe Post
 getPost code posts =
   let
-    filterByCode : Post -> Bool
-    filterByCode post =
-      post.code == code
-
-    postsByCode = List.filter filterByCode posts
+    postsByCode = List.filter (\post -> post.code == code) posts
   in
     List.head postsByCode
 
 
+getPostComments : String -> Dict String (List Comment) -> List Comment
+getPostComments code comments =
+  case (Dict.get code comments) of
+    Just comments ->
+      comments
+
+    Nothing ->
+      []
+
+
 viewPost : Model -> Post -> Html Msg
 viewPost model post =
-  figure [ class "grid-figure" ]
-    [ div [ class "grid-photo-wrap" ]
-      [ a [ href (State.toURL (Photo post.code)) ]
-        [ img [ src post.display_src, alt post.caption, class "grid-photo" ] []
+  let
+    postComments = getPostComments post.code model.comments
+  in
+    figure [ class "grid-figure" ]
+      [ div [ class "grid-photo-wrap" ]
+        [ a [ href (State.toURL (Photo post.code)) ]
+          [ img [ src post.display_src, alt post.caption, class "grid-photo" ] []
+          ]
+        , span [ class "likes-heart" ] [ text (toString post.likes) ]
         ]
-      , span [ class "likes-heart" ] [ text (toString post.likes) ]
-      ]
-    , figcaption []
-      [ p [] [ text post.caption ]
-      , div [ class "control-buttons" ]
-        [ button [ onClick (IncrementLikes post.code), class "likes" ] [ text ("♥ " ++ (toString post.likes)) ]
-        , a [ href (State.toURL (Photo post.code)), class "button" ]
-          [ span [ class "comment-count" ]
-            [ span [ class "speech-bubble" ] []
-            , text (" " ++ (viewCommentsCount (getPostComments post.code model.comments)))
+      , figcaption []
+        [ p [] [ text post.caption ]
+        , div [ class "control-buttons" ]
+          [ button [ onClick (IncrementLikes post.code), class "likes" ] [ text ("♥ " ++ (toString post.likes)) ]
+          , a [ href (State.toURL (Photo post.code)), class "button" ]
+            [ span [ class "comment-count" ]
+              [ span [ class "speech-bubble" ] []
+              , text (" " ++ (postComments |> List.length |> toString))
+              ]
             ]
           ]
         ]
       ]
-    ]
 
 
-getPostComments : String -> Dict String (List Comment) -> Maybe (List Comment)
-getPostComments code comments =
-  Dict.get code comments
-
-
-viewComments : Model -> String -> Maybe (List Comment) -> Html Msg
+viewComments : Model -> String -> List Comment -> Html Msg
 viewComments model code comments =
   let
-    listOfComments =
-      case comments of
-        Just comments ->
-          List.indexedMap (viewComment code) comments
-
-        Nothing ->
-          []
+    listOfComments = List.indexedMap (viewComment code) comments
   in
     div [ class "comments" ]
-    (listOfComments ++ [ (viewCommentsForm model code) ])
+      (listOfComments ++ [ (viewCommentsForm model code) ])
 
 
 viewComment : String -> Int -> Comment -> Html Msg
 viewComment code index comment =
   div [ class "comment" ]
-  [ p []
-    [ strong [] [ text comment.user ]
-    , text comment.text
-    , button [ onClick (RemoveComment code index), class "remove-comment" ] [ text "×" ]
+    [ p []
+      [ strong [] [ text comment.user ]
+      , text comment.text
+      , button [ onClick (RemoveComment code index), class "remove-comment" ] [ text "×" ]
+      ]
     ]
-  ]
 
 
 viewCommentsForm : Model -> String -> Html Msg
 viewCommentsForm model code =
   Html.form [ onSubmit (AddComment code model.comment), class "comment-form" ]
-  [ input
-    [ type' "text"
-    , value model.comment.user
-    , onInput UpdateCommentUser
-    , placeholder "author"
-    ] []
-  , input
-    [ type' "text"
-    , value model.comment.text
-    , onInput UpdateCommentText
-    , placeholder "comment"
-    ] []
-  , input
-    [ type' "submit"
-    , hidden True
-    ] []
-  ]
-
-
-viewCommentsCount : Maybe (List Comment) -> String
-viewCommentsCount comments =
-  let
-    commentsCount =
-      case comments of
-        Just comments ->
-          List.length comments
-
-        Nothing ->
-          0
-  in
-    toString commentsCount
+    [ input
+      [ type' "text"
+      , value model.comment.user
+      , onInput UpdateCommentUser
+      , placeholder "author"
+      ] []
+    , input
+      [ type' "text"
+      , value model.comment.text
+      , onInput UpdateCommentText
+      , placeholder "comment"
+      ] []
+    , input
+      [ type' "submit"
+      , hidden True
+      ] []
+    ]
