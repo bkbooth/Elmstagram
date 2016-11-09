@@ -3,6 +3,7 @@ module View exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Keyed
 import Dict exposing (Dict)
 
 import Types exposing (..)
@@ -23,8 +24,8 @@ viewPage : Model -> Html Msg
 viewPage model =
   case model.page of
     Photos ->
-      div [ class "photo-grid" ]
-        (List.map (viewPost model) model.posts)
+      Html.Keyed.node "div" [ class "photo-grid" ]
+        (List.map (viewKeyedPost model) model.posts)
 
     Photo code ->
       let
@@ -87,43 +88,52 @@ viewPost model post =
       ]
 
 
+viewKeyedPost : Model -> Post -> (String, Html Msg)
+viewKeyedPost model post =
+  (post.code, (viewPost model post))
+
+
 viewComments : Model -> String -> List Comment -> Html Msg
 viewComments model code comments =
   let
     listOfComments = List.indexedMap (viewComment code) comments
   in
-    div [ class "comments" ]
+    Html.Keyed.node "div" [ class "comments" ]
       (listOfComments ++ [ (viewCommentsForm model code) ])
 
 
-viewComment : String -> Int -> Comment -> Html Msg
+viewComment : String -> Int -> Comment -> (String, Html Msg)
 viewComment code index comment =
-  div [ class "comment" ]
-    [ p []
-      [ strong [] [ text comment.user ]
-      , text comment.text
-      , button [ onClick (RemoveComment code index), class "remove-comment" ] [ text "×" ]
+  ( (toString index)
+  , div [ class "comment" ]
+      [ p []
+        [ strong [] [ text comment.user ]
+        , text comment.text
+        , button [ onClick (RemoveComment code index), class "remove-comment" ] [ text "×" ]
+        ]
       ]
-    ]
+  )
 
 
-viewCommentsForm : Model -> String -> Html Msg
+viewCommentsForm : Model -> String -> (String, Html Msg)
 viewCommentsForm model code =
-  Html.form [ onSubmit (AddComment code model.comment), class "comment-form" ]
-    [ input
-      [ type' "text"
-      , value model.comment.user
-      , onInput UpdateCommentUser
-      , placeholder "author"
-      ] []
-    , input
-      [ type' "text"
-      , value model.comment.text
-      , onInput UpdateCommentText
-      , placeholder "comment"
-      ] []
-    , input
-      [ type' "submit"
-      , hidden True
-      ] []
-    ]
+  ( "comment-form"
+  , Html.form [ onSubmit (AddComment code model.comment), class "comment-form" ]
+      [ input
+        [ type' "text"
+        , value model.comment.user
+        , onInput UpdateCommentUser
+        , placeholder "author"
+        ] []
+      , input
+        [ type' "text"
+        , value model.comment.text
+        , onInput UpdateCommentText
+        , placeholder "comment"
+        ] []
+      , input
+        [ type' "submit"
+        , hidden True
+        ] []
+      ]
+  )
