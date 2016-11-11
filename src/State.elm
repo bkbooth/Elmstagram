@@ -73,7 +73,7 @@ update action model =
               Just (comments ++ [ comment ])
 
             Nothing ->
-              Nothing
+              Just [ comment ]
 
         updatedComments = Dict.update code addPostComment model.comments
       in
