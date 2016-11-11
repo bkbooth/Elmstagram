@@ -2,13 +2,19 @@
   "name": "Elmstagram",
   "version": "1.0.0",
   "scripts": {
-    "build": "elm make src/App.elm --output dist/elm.js",
+    "build": "npm run build:elm",
+    "build:elm": "elm make src/App.elm --output dist/elm.js",
     "clean": "rimraf dist",
     "copy": "mkdirp dist && cp -R public/* dist",
     "postinstall": "elm package install -y",
-    "prebuild": "npm run clean && npm run copy"
+    "prebuild": "npm run clean && npm run copy",
+    "prewatch": "npm run clean && npm run copy",
+    "start": "node http-server",
+    "watch": "npm run watch:elm",
+    "watch:elm": "chokidar src/*.elm -c 'npm run build:elm' --initial"
   },
   "devDependencies": {
+    "chokidar-cli": "^1.2.0",
     "elm": "^0.17.1",
     "express": "^4.14.0",
     "mkdirp": "^0.5.1",
