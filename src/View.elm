@@ -12,11 +12,29 @@ import State
 
 rootView : Model -> Html Msg
 rootView model =
-  div []
-    [ h1 []
-      [ a [ href (State.toURL Photos) ] [ text "Elmstagram" ]
+  div [ id "app-root" ]
+    [ main' []
+      [ (viewPage model)
       ]
-    , (viewPage model)
+    , nav []
+      [ div [ class "nav-inner" ]
+        [ a [ href (State.toURL Photos), class "nav-logo" ]
+          [ img [ src "img/logo.svg" ] []
+          , text "Elmstagram"
+          ]
+        ]
+      ]
+    , footer []
+      [ div [ class "footer-inner" ]
+        [ p []
+          [ a [ href "https://twitter.com/bkbooth11" ] [ text "Ben Booth" ]
+          , text "|"
+          , a [ href "https://github.com/bkbooth/Elmstagram.git" ] [ text "View Source" ]
+          , text "|"
+          , a [ href (State.toURL Photos) ] [ text "Elmstagram" ]
+          ]
+        ]
+      ]
     ]
 
 
@@ -24,19 +42,17 @@ viewPage : Model -> Html Msg
 viewPage model =
   case model.page of
     Photos ->
-      Html.Keyed.node "div" [ class "photo-grid" ]
+      Html.Keyed.node "div" [ class "photo-list" ]
         (List.map (viewKeyedPost model) model.posts)
 
     Photo code ->
       let
         post = getPost code model.posts
-        postComments = getPostComments code model.comments
       in
         case post of
           Just post ->
-            div [ class "single-photo" ]
+            div [ class "photo-single" ]
               [ (viewPost model post)
-              , (viewComments model post.code postComments)
               ]
 
           Nothing ->
@@ -65,24 +81,35 @@ viewPost : Model -> Post -> Html Msg
 viewPost model post =
   let
     postComments = getPostComments post.code model.comments
+    displayComments =
+      case model.page of
+        Photo code ->
+          (viewComments model post postComments)
+
+        Photos ->
+          div [] []
   in
-    figure [ class "grid-figure" ]
-      [ div [ class "grid-photo-wrap" ]
+    figure [ class "photo-figure" ]
+      [ div [ class "photo-wrap" ]
         [ a [ href (State.toURL (Photo post.code)) ]
-          [ img [ src post.display_src, alt post.caption, class "grid-photo" ] []
+          [ img [ src post.display_src, alt post.caption, class "photo" ] []
           ]
-        , span [ class "likes-heart" ] [ text (toString post.likes) ]
         ]
       , figcaption []
-        [ p [] [ text post.caption ]
-        , div [ class "control-buttons" ]
-          [ button [ onClick (IncrementLikes post.code), class "likes" ] [ text ("♥ " ++ (toString post.likes)) ]
-          , a [ href (State.toURL (Photo post.code)), class "button" ]
-            [ span [ class "comment-count" ]
-              [ span [ class "speech-bubble" ] []
-              , text (" " ++ (postComments |> List.length |> toString))
+        [ div [ class "caption-button" ]
+          [ button [ onClick (IncrementLikes post.code), class "like-button" ] [ text "♡" ]
+          ]
+        , div [ class "caption-content" ]
+          [ div [ class "photo-stats" ]
+            [ strong [] [ text (toString post.likes) ]
+            , text " likes, "
+            , a [ href (State.toURL (Photo post.code)) ]
+              [ strong [] [ text (postComments |> List.length |> toString) ]
+              , text " comments"
               ]
             ]
+          , p [ class "photo-caption" ] [ text post.caption ]
+          , displayComments
           ]
         ]
       ]
@@ -93,43 +120,43 @@ viewKeyedPost model post =
   (post.code, (viewPost model post))
 
 
-viewComments : Model -> String -> List Comment -> Html Msg
-viewComments model code comments =
+viewComments : Model -> Post -> List Comment -> Html Msg
+viewComments model post comments =
   let
-    listOfComments = List.indexedMap (viewComment code) comments
+    listOfComments = List.indexedMap (viewComment post) comments
   in
     Html.Keyed.node "div" [ class "comments" ]
-      (listOfComments ++ [ (viewCommentsForm model code) ])
+      (listOfComments ++ [ (viewCommentsForm model post) ])
 
 
-viewComment : String -> Int -> Comment -> (String, Html Msg)
-viewComment code index comment =
+viewComment : Post -> Int -> Comment -> (String, Html Msg)
+viewComment post index comment =
   ( (toString index)
   , div [ class "comment" ]
       [ p []
         [ strong [] [ text comment.user ]
         , text comment.text
-        , button [ onClick (RemoveComment code index), class "remove-comment" ] [ text "×" ]
+        , button [ onClick (RemoveComment post.code index), class "remove-comment" ] [ text "×" ]
         ]
       ]
   )
 
 
-viewCommentsForm : Model -> String -> (String, Html Msg)
-viewCommentsForm model code =
+viewCommentsForm : Model -> Post -> (String, Html Msg)
+viewCommentsForm model post =
   ( "comment-form"
-  , Html.form [ onSubmit (AddComment code model.comment), class "comment-form" ]
+  , Html.form [ onSubmit (AddComment post.code model.comment), class "comment-form" ]
       [ input
         [ type' "text"
         , value model.comment.user
         , onInput UpdateCommentUser
-        , placeholder "author"
+        , placeholder "author..."
         ] []
       , input
         [ type' "text"
         , value model.comment.text
         , onInput UpdateCommentText
-        , placeholder "comment"
+        , placeholder "comment..."
         ] []
       , input
         [ type' "submit"

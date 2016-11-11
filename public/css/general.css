@@ -1,0 +1,50 @@
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.3s;
+}
+button {
+  background: none;
+  outline: none;
+  cursor: pointer;
+}
+a:hover,
+button:hover {
+  opacity: 0.8;
+}
+
+strong, b {
+  font-weight: 500;
+}
+
+html, body, #app-root {
+  height: 100%;
+}
+
+body, button, input, textarea {
+  font-family: 'proxima-nova', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-weight: 200;
+  font-size: 15px;
+  line-height: 18px;
+}
+
+input {
+  display: block;
+  outline: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  background: #fafafa;
+}
