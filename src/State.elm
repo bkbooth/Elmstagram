@@ -37,6 +37,11 @@ update action model =
     FetchFail _ ->
       model ! []
 
+    NavigateTo path ->
+      model !
+        [ Navigation.newUrl path
+        ]
+
     IncrementLikes code ->
       let
         incrementPostLikes : String -> Post -> Post
@@ -121,7 +126,7 @@ pageFromResult result =
 toURL : Page -> String
 toURL page =
   let
-    baseUrl = "#/"
+    baseUrl = "/"
   in
     case page of
       Photos ->
@@ -131,10 +136,9 @@ toURL page =
         baseUrl ++ "view/" ++ code
 
 
--- TODO: use location.pathname instead
-hashParser : Navigation.Location -> Result String Page
-hashParser location =
-  UrlParser.parse identity pageParser (String.dropLeft 2 location.hash)
+pathParser : Navigation.Location -> Result String Page
+pathParser location =
+  UrlParser.parse identity pageParser (String.dropLeft 1 location.pathname)
 
 
 pageParser : Parser (Page -> a) a

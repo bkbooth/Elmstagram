@@ -8,7 +8,7 @@ import View
 
 main : Program Never
 main =
-  Navigation.program (Navigation.makeParser State.hashParser)
+  Navigation.program (Navigation.makeParser State.pathParser)
     { init = State.init
     , update = State.update
     , urlUpdate = State.urlUpdate

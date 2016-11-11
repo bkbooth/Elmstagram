@@ -2,9 +2,10 @@ module View exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Events exposing (onClick, onInput, onSubmit, onWithOptions)
 import Html.Keyed
 import Dict exposing (Dict)
+import Json.Decode as Json
 
 import Types exposing (..)
 import State
@@ -18,7 +19,7 @@ rootView model =
       ]
     , nav []
       [ div [ class "nav-inner" ]
-        [ a [ href (State.toURL Photos), class "nav-logo" ]
+        [ a (clickTo (State.toURL Photos) [ class "nav-logo" ])
           [ img [ src "img/logo.svg" ] []
           , text "Elmstagram"
           ]
@@ -31,7 +32,7 @@ rootView model =
           , text "|"
           , a [ href "https://github.com/bkbooth/Elmstagram.git" ] [ text "View Source" ]
           , text "|"
-          , a [ href (State.toURL Photos) ] [ text "Elmstagram" ]
+          , a (clickTo (State.toURL Photos) []) [ text "Elmstagram" ]
           ]
         ]
       ]
@@ -91,7 +92,7 @@ viewPost model post =
   in
     figure [ class "photo-figure" ]
       [ div [ class "photo-wrap" ]
-        [ a [ href (State.toURL (Photo post.code)) ]
+        [ a (clickTo (State.toURL (Photo post.code)) [])
           [ img [ src post.display_src, alt post.caption, class "photo" ] []
           ]
         ]
@@ -103,7 +104,7 @@ viewPost model post =
           [ div [ class "photo-stats" ]
             [ strong [] [ text (toString post.likes) ]
             , text " likes, "
-            , a [ href (State.toURL (Photo post.code)) ]
+            , a (clickTo (State.toURL (Photo post.code)) [])
               [ strong [] [ text (postComments |> List.length |> toString) ]
               , text " comments"
               ]
@@ -164,3 +165,19 @@ viewCommentsForm model post =
         ] []
       ]
   )
+
+
+clickTo : String -> List (Attribute Msg) -> List (Attribute Msg)
+clickTo path attributes =
+  let
+    options =
+      { stopPropagation = True
+      , preventDefault = True
+      }
+  in
+    [ href path
+    , onWithOptions
+        "click"
+        options
+        (Json.map (\_ -> NavigateTo path) Json.value)
+    ] ++ attributes

@@ -21,6 +21,7 @@ type Msg
   = FetchPostsSuccess (List Post)
   | FetchCommentsSuccess (Dict String (List Comment))
   | FetchFail Http.Error
+  | NavigateTo String
   | IncrementLikes String
   | UpdateCommentUser String
   | UpdateCommentText String
