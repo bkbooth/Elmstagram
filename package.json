@@ -1,0 +1,21 @@
+{
+  "name": "Elmstagram",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "elm make src/App.elm --output dist/elm.js",
+    "clean": "rimraf dist",
+    "copy": "mkdirp dist && cp -R public/* dist",
+    "postinstall": "elm package install -y",
+    "prebuild": "npm run clean && npm run copy"
+  },
+  "devDependencies": {
+    "elm": "^0.17.1",
+    "express": "^4.14.0",
+    "mkdirp": "^0.5.1",
+    "morgan": "^1.7.0",
+    "rimraf": "^2.5.4"
+  },
+  "engines": {
+    "node": ">= 6.0.0"
+  }
+}
