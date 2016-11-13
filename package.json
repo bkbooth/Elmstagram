@@ -11,7 +11,7 @@
     "prewatch": "npm run clean && npm run copy",
     "start": "node http-server",
     "watch": "npm run watch:elm",
-    "watch:elm": "chokidar src/*.elm -c 'npm run build:elm' --initial"
+    "watch:elm": "chokidar src/* -c 'npm run build:elm' --initial"
   },
   "devDependencies": {
     "chokidar-cli": "^1.2.0",
