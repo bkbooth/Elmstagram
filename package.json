@@ -2,24 +2,27 @@
   "name": "Elmstagram",
   "version": "1.0.0",
   "scripts": {
-    "build": "npm run build:elm",
-    "build:elm": "elm make src/App.elm --output dist/elm.js",
+    "build": "webpack",
     "clean": "rimraf dist",
-    "copy": "mkdirp dist && cp -R public/* dist",
     "postinstall": "elm package install -y",
-    "prebuild": "npm run clean && npm run copy",
-    "prewatch": "npm run clean && npm run copy",
-    "start": "node http-server",
-    "watch": "npm run watch:elm",
-    "watch:elm": "chokidar src/* -c 'npm run build:elm' --initial"
+    "prebuild": "npm run clean",
+    "start": "webpack-dev-server --profile --progress --watch --inline --hot --content-base src/",
+    "watch": "npm run build -- --watch"
   },
   "devDependencies": {
-    "chokidar-cli": "^1.2.0",
+    "copy-webpack-plugin": "^4.0.0",
+    "css-loader": "^0.25.0",
     "elm": "^0.17.1",
-    "express": "^4.14.0",
-    "mkdirp": "^0.5.1",
-    "morgan": "^1.7.0",
-    "rimraf": "^2.5.4"
+    "elm-hot-loader": "^0.4.1",
+    "elm-webpack-loader": "^3.0.6",
+    "extract-text-webpack-plugin": "2.0.0-beta.4",
+    "file-loader": "^0.9.0",
+    "html-webpack-plugin": "^2.24.1",
+    "rimraf": "^2.5.4",
+    "style-loader": "^0.13.1",
+    "webpack": "2.1.0-beta.25",
+    "webpack-dev-server": "2.1.0-beta.10",
+    "webpack-merge": "^0.15.0"
   },
   "engines": {
     "node": ">= 6.0.0"

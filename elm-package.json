@@ -4,7 +4,7 @@
   "repository": "https://github.com/bkbooth/elmstagram.git",
   "license": "MIT",
   "source-directories": [
-    "src"
+    "src/app"
   ],
   "exposed-modules": [],
   "dependencies": {
