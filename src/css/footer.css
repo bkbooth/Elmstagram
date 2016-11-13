@@ -7,7 +7,7 @@ footer {
 
 footer > .footer-inner {
   font-size: 12px;
-  font-weight: 500;
+  font-weight: bold;
   text-transform: uppercase;
   max-width: 935px;
   padding: 38px 0;

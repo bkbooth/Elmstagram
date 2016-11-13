@@ -21,17 +21,13 @@ button:hover {
   opacity: 0.8;
 }
 
-strong, b {
-  font-weight: 500;
-}
-
 html, body, #app-root {
   height: 100%;
 }
 
 body, button, input, textarea {
   font-family: 'proxima-nova', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-  font-weight: 200;
+  font-weight: normal;
   font-size: 15px;
   line-height: 18px;
 }
