@@ -5,10 +5,10 @@ import Http
 
 
 type alias Model =
-  { posts : List Post
+  { posts: List Post
   , comments: Dict String (List Comment)
   , page: Page
-  , comment: Comment
+  , newComment: Comment
   }
 
 
@@ -19,11 +19,12 @@ initialModel page =
 
 type Msg
   = FetchPostsSuccess (List Post)
-  | FetchCommentsSuccess (Dict String (List Comment))
-  | FetchFail Http.Error
+  | FetchPostsFail Http.Error
+  | FetchCommentsSuccess String (List Comment)
+  | FetchCommentsFail String Http.Error
   | NavigateTo String
   | IncrementLikes String
-  | UpdateCommentUser String
+  | UpdateCommentUsername String
   | UpdateCommentText String
   | AddComment String Comment
   | RemoveComment String Int
@@ -35,15 +36,15 @@ type Page
 
 
 type alias Post =
-  { code: String
-  , caption: String
+  { id: String
   , likes: Int
-  , id: String
-  , display_src: String
+  , comments: Int
+  , text: String
+  , media: String
   }
 
 
 type alias Comment =
-  { text: String
-  , user: String
+  { username: String
+  , text: String
   }

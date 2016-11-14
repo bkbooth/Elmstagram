@@ -1,7 +1,7 @@
 module State exposing (..)
 
 import String
-import Dict
+import Dict exposing (Dict)
 import List.Extra
 import Navigation
 import UrlParser exposing (..)
@@ -16,10 +16,17 @@ init : Result String Page -> (Model, Cmd Msg)
 init result =
   let
     model = initialModel (pageFromResult result)
+    getCommentsCommand =
+      case model.page of
+        Photo postId ->
+          Rest.getPostComments postId
+
+        Photos ->
+          Cmd.none
   in
     model !
-      [ Rest.getData FetchFail FetchPostsSuccess Rest.decodePosts "data/posts.json"
-      , Rest.getData FetchFail FetchCommentsSuccess Rest.decodeComments "data/comments.json"
+      [ Rest.getPosts
+      , getCommentsCommand
       ]
 
 
@@ -31,45 +38,53 @@ update action model =
     FetchPostsSuccess posts ->
       { model | posts = posts } ! []
 
-    FetchCommentsSuccess comments ->
-      { model | comments = comments } ! []
-
-    FetchFail _ ->
+    FetchPostsFail _ ->
       model ! []
+
+    FetchCommentsSuccess postId comments ->
+      { model
+        | comments = Dict.insert postId comments model.comments
+        , posts = List.map (setPostComments postId (List.length comments)) model.posts
+        } ! []
+
+    FetchCommentsFail postId _ ->
+      update (FetchCommentsSuccess postId []) model
 
     NavigateTo path ->
       model !
         [ Navigation.newUrl path
         ]
 
-    IncrementLikes code ->
+    IncrementLikes postId ->
       let
         incrementPostLikes : String -> Post -> Post
-        incrementPostLikes code post =
-          if post.code == code then
+        incrementPostLikes postId post =
+          if post.id == postId then
             { post | likes = post.likes + 1 }
           else
             post
-
-        updatedPosts = List.map (incrementPostLikes code) model.posts
       in
-        { model | posts = updatedPosts } ! []
+        { model
+          | posts = List.map (incrementPostLikes postId) model.posts
+          } ! []
 
-    UpdateCommentUser user ->
+    UpdateCommentUsername username ->
       let
-        comment = model.comment
-        updatedComment = { comment | user = user }
+        comment = model.newComment
       in
-        { model | comment = updatedComment } ! []
+        { model
+          | newComment = { comment | username = username }
+          } ! []
 
     UpdateCommentText text ->
       let
-        comment = model.comment
-        updatedComment = { comment | text = text }
+        comment = model.newComment
       in
-        { model | comment = updatedComment } ! []
+        { model
+          | newComment = { comment | text = text }
+          } ! []
 
-    AddComment code comment ->
+    AddComment postId comment ->
       let
         addPostComment : Maybe (List Comment) -> Maybe (List Comment)
         addPostComment comments =
@@ -80,14 +95,15 @@ update action model =
             Nothing ->
               Just [ comment ]
 
-        updatedComments = Dict.update code addPostComment model.comments
+        numberOfPostComments = getNumberOfPostComments postId model.comments
       in
         { model
-          | comments = updatedComments
-          , comment = Comment "" ""
+          | comments = Dict.update postId addPostComment model.comments
+          , posts = List.map (setPostComments postId (numberOfPostComments + 1)) model.posts
+          , newComment = Comment "" ""
           } ! []
 
-    RemoveComment code index ->
+    RemoveComment postId index ->
       let
         removePostComment : Maybe (List Comment) -> Maybe (List Comment)
         removePostComment comments =
@@ -98,9 +114,30 @@ update action model =
             Nothing ->
               Nothing
 
-        updatedComments = Dict.update code removePostComment model.comments
+        numberOfPostComments = getNumberOfPostComments postId model.comments
       in
-        { model | comments = updatedComments } ! []
+        { model
+          | comments = Dict.update postId removePostComment model.comments
+          , posts = List.map (setPostComments postId (numberOfPostComments - 1)) model.posts
+          } ! []
+
+
+setPostComments : String -> Int -> Post -> Post
+setPostComments postId numberOfComments post =
+  if post.id == postId then
+    { post | comments = numberOfComments }
+  else
+    post
+
+
+getNumberOfPostComments : String -> (Dict String (List Comment)) -> Int
+getNumberOfPostComments postId comments =
+  case Dict.get postId comments of
+    Just postComments ->
+      List.length postComments
+
+    Nothing ->
+      0
 
 
 -- URL UPDATE
@@ -109,8 +146,17 @@ urlUpdate : Result String Page -> Model -> (Model, Cmd Msg)
 urlUpdate result model =
   let
     page = pageFromResult result
+    command =
+      case page of
+        Photo postId ->
+          Rest.getPostComments postId
+
+        Photos ->
+          Cmd.none
   in
-    { model | page = page } ! []
+    { model
+      | page = page
+      } ! [ command ]
 
 
 pageFromResult : Result String Page -> Page
@@ -132,8 +178,8 @@ toURL page =
       Photos ->
         baseUrl
 
-      Photo code ->
-        baseUrl ++ "view/" ++ code
+      Photo postId ->
+        baseUrl ++ "view/" ++ postId
 
 
 pathParser : Navigation.Location -> Result String Page

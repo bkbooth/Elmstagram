@@ -46,9 +46,9 @@ viewPage model =
       Html.Keyed.node "div" [ class "photo-list" ]
         (List.map (viewKeyedPost model) model.posts)
 
-    Photo code ->
+    Photo postId ->
       let
-        post = getPost code model.posts
+        post = getPost postId model.posts
       in
         case post of
           Just post ->
@@ -61,16 +61,16 @@ viewPage model =
 
 
 getPost : String -> List Post -> Maybe Post
-getPost code posts =
+getPost postId posts =
   let
-    postsByCode = List.filter (\post -> post.code == code) posts
+    postsById = List.filter (\post -> post.id == postId) posts
   in
-    List.head postsByCode
+    List.head postsById
 
 
 getPostComments : String -> Dict String (List Comment) -> List Comment
-getPostComments code comments =
-  case (Dict.get code comments) of
+getPostComments postId comments =
+  case (Dict.get postId comments) of
     Just comments ->
       comments
 
@@ -81,35 +81,34 @@ getPostComments code comments =
 viewPost : Model -> Post -> Html Msg
 viewPost model post =
   let
-    postComments = getPostComments post.code model.comments
     displayComments =
       case model.page of
-        Photo code ->
-          (viewComments model post postComments)
+        Photo postId ->
+          (viewComments model post)
 
         Photos ->
           div [] []
   in
     figure [ class "photo-figure" ]
       [ div [ class "photo-wrap" ]
-        [ a (clickTo (State.toURL (Photo post.code)) [])
-          [ img [ src post.display_src, alt post.caption, class "photo" ] []
+        [ a (clickTo (State.toURL (Photo post.id)) [])
+          [ img [ src post.media, alt post.text, class "photo" ] []
           ]
         ]
       , figcaption []
         [ div [ class "caption-button" ]
-          [ button [ onClick (IncrementLikes post.code), class "like-button" ] [ text "♡" ]
+          [ button [ onClick (IncrementLikes post.id), class "like-button" ] [ text "♡" ]
           ]
         , div [ class "caption-content" ]
           [ div [ class "photo-stats" ]
             [ strong [] [ text (toString post.likes) ]
             , text " likes, "
-            , a (clickTo (State.toURL (Photo post.code)) [])
-              [ strong [] [ text (postComments |> List.length |> toString) ]
+            , a (clickTo (State.toURL (Photo post.id)) [])
+              [ strong [] [ text (toString post.comments) ]
               , text " comments"
               ]
             ]
-          , p [ class "photo-caption" ] [ text post.caption ]
+          , p [ class "photo-caption" ] [ text post.text ]
           , displayComments
           ]
         ]
@@ -118,13 +117,13 @@ viewPost model post =
 
 viewKeyedPost : Model -> Post -> (String, Html Msg)
 viewKeyedPost model post =
-  (post.code, (viewPost model post))
+  (post.id, (viewPost model post))
 
 
-viewComments : Model -> Post -> List Comment -> Html Msg
-viewComments model post comments =
+viewComments : Model -> Post -> Html Msg
+viewComments model post =
   let
-    listOfComments = List.indexedMap (viewComment post) comments
+    listOfComments = List.indexedMap (viewComment post) (getPostComments post.id model.comments)
   in
     Html.Keyed.node "div" [ class "comments" ]
       (listOfComments ++ [ (viewCommentsForm model post) ])
@@ -135,9 +134,9 @@ viewComment post index comment =
   ( (toString index)
   , div [ class "comment" ]
       [ p []
-        [ strong [] [ text comment.user ]
+        [ strong [] [ text comment.username ]
         , text comment.text
-        , button [ onClick (RemoveComment post.code index), class "remove-comment" ] [ text "×" ]
+        , button [ onClick (RemoveComment post.id index), class "remove-comment" ] [ text "×" ]
         ]
       ]
   )
@@ -146,16 +145,16 @@ viewComment post index comment =
 viewCommentsForm : Model -> Post -> (String, Html Msg)
 viewCommentsForm model post =
   ( "comment-form"
-  , Html.form [ onSubmit (AddComment post.code model.comment), class "comment-form" ]
+  , Html.form [ onSubmit (AddComment post.id model.newComment), class "comment-form" ]
       [ input
         [ type' "text"
-        , value model.comment.user
-        , onInput UpdateCommentUser
+        , value model.newComment.username
+        , onInput UpdateCommentUsername
         , placeholder "author..."
         ] []
       , input
         [ type' "text"
-        , value model.comment.text
+        , value model.newComment.text
         , onInput UpdateCommentText
         , placeholder "comment..."
         ] []
