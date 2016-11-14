@@ -1,7 +1,9 @@
-dist/
+.idea/
 
 elm-stuff/
 repl-temp-*
 
 node_modules/
 npm-debug.log
+
+dist/
