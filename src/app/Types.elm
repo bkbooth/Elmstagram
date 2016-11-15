@@ -5,46 +5,46 @@ import Http
 
 
 type alias Model =
-  { posts: List Post
-  , comments: Dict String (List Comment)
-  , page: Page
-  , newComment: Comment
-  }
+    { posts : List Post
+    , comments : Dict String (List Comment)
+    , page : Page
+    , newComment : Comment
+    }
 
 
 initialModel : Page -> Model
 initialModel page =
-  Model [] Dict.empty page (Comment "" "")
+    Model [] Dict.empty page (Comment "" "")
 
 
 type Msg
-  = FetchPostsSuccess (List Post)
-  | FetchPostsFail Http.Error
-  | FetchCommentsSuccess String (List Comment)
-  | FetchCommentsFail String Http.Error
-  | NavigateTo String
-  | IncrementLikes String
-  | UpdateCommentUsername String
-  | UpdateCommentText String
-  | AddComment String Comment
-  | RemoveComment String Int
+    = FetchPostsSuccess (List Post)
+    | FetchPostsFail Http.Error
+    | FetchCommentsSuccess String (List Comment)
+    | FetchCommentsFail String Http.Error
+    | NavigateTo String
+    | IncrementLikes String
+    | UpdateCommentUsername String
+    | UpdateCommentText String
+    | AddComment String Comment
+    | RemoveComment String Int
 
 
 type Page
-  = Photos
-  | Photo String
+    = Photos
+    | Photo String
 
 
 type alias Post =
-  { id: String
-  , likes: Int
-  , comments: Int
-  , text: String
-  , media: String
-  }
+    { id : String
+    , likes : Int
+    , comments : Int
+    , text : String
+    , media : String
+    }
 
 
 type alias Comment =
-  { username: String
-  , text: String
-  }
+    { username : String
+    , text : String
+    }
