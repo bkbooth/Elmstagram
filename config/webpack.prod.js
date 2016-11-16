@@ -16,10 +16,10 @@ module.exports = function(options) {
     module: {
       rules: [
         {
-          test: /\.css$/,
+          test: /\.s?css$/,
           loader: ExtractTextPlugin.extract({
             fallbackLoader: 'style-loader',
-            loader: 'css-loader?sourceMap&importLoaders=1!postcss-loader',
+            loader: 'css-loader?sourceMap&importLoaders=1!postcss-loader!sass-loader?sourceMap',
           }),
         },
       ]

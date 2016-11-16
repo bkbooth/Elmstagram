@@ -1,0 +1,115 @@
+#app-root {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+main {
+  flex-grow: 1;
+  order: 1;
+}
+
+
+/**
+ * PHOTO VIEWER
+ */
+.photo-figure {
+  background: $photoBackgroundColor;
+  border: 1px solid $photoBorderColor;
+  border-radius: 3px;
+
+  .photo-wrap {
+    border-bottom: 1px solid $photoBorderColor;
+    overflow: auto;
+
+    a {
+      display: block;
+    }
+
+    .photo {
+      max-width: 100%;
+      float: left;
+      user-select: none;
+    }
+  }
+
+  figcaption {
+    padding: 20px 18px;
+    overflow: auto;
+
+    .caption-button {
+      float: left;
+      width: 35px;
+    }
+
+    .caption-content {
+      float: left;
+      width: calc(100% - 35px);
+    }
+
+    .like-button {
+      font-size: 25px;
+      line-height: 30px;
+    }
+
+    .photo-stats {
+      margin: 0 0 7px;
+    }
+
+    .photo-caption {
+      margin: 7px 0 0;
+    }
+  }
+}
+
+
+/**
+ * LIST VIEW
+ */
+.photo-list {
+  max-width: 600px;
+  padding-top: 60px;
+  margin: 0 auto;
+
+  .photo-figure {
+    margin-bottom: 60px;
+  }
+}
+
+
+/**
+ * SINGLE VIEW
+ */
+.photo-single {
+  max-width: 935px;
+  padding: 40px 0;
+  margin: 0 auto;
+
+  @media (min-width: 736px) {
+    .photo-figure {
+      overflow: auto;
+
+      .photo-wrap {
+        float: left;
+        width: 50%;
+      }
+
+      figcaption {
+        float: right;
+        width: 50%;
+      }
+    }
+  }
+
+  @media (min-width: 900px) {
+    .photo-figure {
+      .photo-wrap {
+        width: 60%;
+      }
+
+      figcaption {
+        width: 40%;
+      }
+    }
+  }
+}

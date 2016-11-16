@@ -1,7 +1,7 @@
 'use strict';
 
 // Load styles
-require('./css/style.css');
+require('./styles/style.scss');
 
 // Inject bundled Elm app
 var Elm = require('./app/App.elm');

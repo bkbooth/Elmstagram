@@ -22,11 +22,12 @@ module.exports = function (options) {
     module: {
       rules: [
         {
-          test: /\.css$/,
+          test: /\.s?css$/,
           loaders: [
             'style-loader',
             'css-loader?sourceMap&importLoaders=1',
             'postcss-loader',
+            'sass-loader?sourceMap',
           ],
         },
       ],

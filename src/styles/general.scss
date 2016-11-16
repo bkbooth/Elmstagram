@@ -9,7 +9,7 @@
 a {
   text-decoration: none;
   color: inherit;
-  transition: opacity 0.3s;
+  transition: opacity $transitionSpeed;
 }
 button {
   background: none;
@@ -26,10 +26,10 @@ html, body, #app-root {
 }
 
 body, button, input, textarea {
-  font-family: 'proxima-nova', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-  font-weight: normal;
-  font-size: 15px;
-  line-height: 18px;
+  font-family: $baseFontFamily;
+  font-weight: $baseFontWeight;
+  font-size: $baseFontSize;
+  line-height: $baseLineHeight;
 }
 
 input {
@@ -42,5 +42,5 @@ input {
 }
 
 body {
-  background: #fafafa;
+  background: $backgroundColor;
 }
