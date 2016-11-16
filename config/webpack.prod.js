@@ -19,7 +19,7 @@ module.exports = function(options) {
           test: /\.css$/,
           loader: ExtractTextPlugin.extract({
             fallbackLoader: 'style-loader',
-            loader: 'css-loader',
+            loader: 'css-loader?sourceMap&importLoaders=1!postcss-loader',
           }),
         },
       ]

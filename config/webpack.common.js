@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const LoaderOptionsPlugin = require('webpack/lib/LoaderOptionsPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = function(options) {
@@ -39,6 +40,16 @@ module.exports = function(options) {
     },
 
     plugins: [
+      new LoaderOptionsPlugin({
+        options: {
+          context: __dirname,
+          postcss: [
+            require('autoprefixer'),
+            require('cssnano'),
+          ],
+        },
+      }),
+
       new HtmlWebpackPlugin({
         template: path.join(options.paths.src, 'index.html'),
       })

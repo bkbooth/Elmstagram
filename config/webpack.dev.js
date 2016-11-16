@@ -8,6 +8,10 @@ module.exports = function (options) {
   return merge(commonConfig, {
     devtool: 'cheap-module-source-map',
 
+    output: {
+      publicPath: `http://${options.host}:${options.port}/`,
+    },
+
     devServer: {
       host: options.host,
       port: options.port,
@@ -21,7 +25,8 @@ module.exports = function (options) {
           test: /\.css$/,
           loaders: [
             'style-loader',
-            'css-loader',
+            'css-loader?sourceMap&importLoaders=1',
+            'postcss-loader',
           ],
         },
       ],
