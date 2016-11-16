@@ -18,8 +18,8 @@ module.exports = function(options) {
         {
           test: /\.css$/,
           loader: ExtractTextPlugin.extract({
-            fallbackLoader: 'style',
-            loader: 'css',
+            fallbackLoader: 'style-loader',
+            loader: 'css-loader',
           }),
         },
       ]

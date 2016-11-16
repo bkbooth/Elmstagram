@@ -4,7 +4,7 @@ const path = require('path');
 
 let options = {
   host: process.env.HOST || 'localhost',
-  port: process.env.PORT || '3000',
+  port: Number(process.env.PORT) || 3000,
   paths: {
     src: path.join(__dirname, 'src'),
     dist: path.join(__dirname, 'dist'),

@@ -12,9 +12,7 @@ module.exports = function (options) {
       host: options.host,
       port: options.port,
       inline: true,
-      progress: true,
       historyApiFallback: true,
-      outputPath: options.paths.dist,
     },
 
     module: {
@@ -22,8 +20,8 @@ module.exports = function (options) {
         {
           test: /\.css$/,
           loaders: [
-            'style',
-            'css',
+            'style-loader',
+            'css-loader',
           ],
         },
       ],

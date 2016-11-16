@@ -2,7 +2,7 @@
   "name": "Elmstagram",
   "version": "1.0.0",
   "scripts": {
-    "build": "webpack",
+    "build": "NODE_ENV=prod webpack",
     "clean": "rimraf dist",
     "postinstall": "elm package install -y",
     "prebuild": "npm run clean",
@@ -20,8 +20,8 @@
     "html-webpack-plugin": "^2.24.1",
     "rimraf": "^2.5.4",
     "style-loader": "^0.13.1",
-    "webpack": "2.1.0-beta.25",
-    "webpack-dev-server": "2.1.0-beta.10",
+    "webpack": "2.1.0-beta.27",
+    "webpack-dev-server": "2.1.0-beta.11",
     "webpack-merge": "^0.16.0"
   },
   "engines": {

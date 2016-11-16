@@ -27,13 +27,13 @@ module.exports = function(options) {
             /node_modules/,
           ],
           loader: options.isProd ?
-            'elm-webpack' :
-            'elm-hot!elm-webpack?verbose=true&warn=true',
+            'elm-webpack-loader' :
+            'elm-hot-loader!elm-webpack-loader?verbose=true&warn=true',
         },
 
         {
           test: /\.(eot|ttf|woff|woff2|svg)$/,
-          loader: 'file',
+          loader: 'file-loader',
         },
       ]
     },
