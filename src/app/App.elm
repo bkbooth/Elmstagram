@@ -3,14 +3,14 @@ module App exposing (main)
 import Navigation
 import State
 import View
+import Types exposing (Model, Msg)
 
 
-main : Program Never
+main : Program Never Model Msg
 main =
-    Navigation.program (Navigation.makeParser State.pathParser)
+    Navigation.program State.pathParser
         { init = State.init
         , update = State.update
-        , urlUpdate = State.urlUpdate
         , subscriptions = State.subscriptions
         , view = View.rootView
         }

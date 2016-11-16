@@ -12,7 +12,7 @@
   "devDependencies": {
     "copy-webpack-plugin": "^4.0.0",
     "css-loader": "^0.25.0",
-    "elm": "^0.17.1",
+    "elm": "^0.18.0",
     "elm-hot-loader": "^0.4.1",
     "elm-webpack-loader": "^3.0.6",
     "extract-text-webpack-plugin": "2.0.0-beta.4",
@@ -22,7 +22,7 @@
     "style-loader": "^0.13.1",
     "webpack": "2.1.0-beta.25",
     "webpack-dev-server": "2.1.0-beta.10",
-    "webpack-merge": "^0.15.0"
+    "webpack-merge": "^0.16.0"
   },
   "engines": {
     "node": ">= 6.0.0"

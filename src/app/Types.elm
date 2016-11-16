@@ -18,11 +18,10 @@ initialModel page =
 
 
 type Msg
-    = FetchPostsSuccess (List Post)
-    | FetchPostsFail Http.Error
-    | FetchCommentsSuccess String (List Comment)
-    | FetchCommentsFail String Http.Error
+    = FetchPosts (Result Http.Error (List Post))
+    | FetchComments String (Result Http.Error (List Comment))
     | NavigateTo String
+    | NavigatedTo (Maybe Page)
     | IncrementLikes String
     | UpdateCommentUsername String
     | UpdateCommentText String

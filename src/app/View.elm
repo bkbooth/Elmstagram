@@ -13,12 +13,12 @@ import State
 rootView : Model -> Html Msg
 rootView model =
     div [ id "app-root" ]
-        [ main' []
-            [ (viewPage model)
+        [ main_ []
+            [ viewPage model
             ]
         , nav []
             [ div [ class "nav-inner" ]
-                [ a (clickTo (State.toURL Photos) [ class "nav-logo" ])
+                [ a (clickTo (State.toUrl Photos) [ class "nav-logo" ])
                     [ img [ src "img/logo.svg" ] []
                     , text "Elmstagram"
                     ]
@@ -31,7 +31,7 @@ rootView model =
                     , text "|"
                     , a [ href "https://github.com/bkbooth/Elmstagram.git" ] [ text "View Source" ]
                     , text "|"
-                    , a (clickTo (State.toURL Photos) []) [ text "Elmstagram" ]
+                    , a (clickTo (State.toUrl Photos) []) [ text "Elmstagram" ]
                     ]
                 ]
             ]
@@ -44,17 +44,18 @@ viewPage model =
         Photos ->
             Html.Keyed.node "div"
                 [ class "photo-list" ]
-                (List.map (viewKeyedPost model) model.posts)
+            <|
+                List.map (viewKeyedPost model) model.posts
 
         Photo postId ->
             let
-                post =
+                maybePost =
                     getPost postId model.posts
             in
-                case post of
+                case maybePost of
                     Just post ->
                         div [ class "photo-single" ]
-                            [ (viewPost model post)
+                            [ viewPost model post
                             ]
 
                     Nothing ->
@@ -73,8 +74,8 @@ getPost postId posts =
 getPostComments : String -> Dict String (List Comment) -> List Comment
 getPostComments postId comments =
     case (Dict.get postId comments) of
-        Just comments ->
-            comments
+        Just postComments ->
+            postComments
 
         Nothing ->
             []
@@ -86,27 +87,27 @@ viewPost model post =
         displayComments =
             case model.page of
                 Photo postId ->
-                    (viewComments model post)
+                    viewComments model post
 
                 Photos ->
                     div [] []
     in
         figure [ class "photo-figure" ]
             [ div [ class "photo-wrap" ]
-                [ a (clickTo (State.toURL (Photo post.id)) [])
+                [ a (clickTo (State.toUrl <| Photo post.id) [])
                     [ img [ src post.media, alt post.text, class "photo" ] []
                     ]
                 ]
             , figcaption []
                 [ div [ class "caption-button" ]
-                    [ button [ onClick (IncrementLikes post.id), class "like-button" ] [ text "♡" ]
+                    [ button [ onClick <| IncrementLikes post.id, class "like-button" ] [ text "♡" ]
                     ]
                 , div [ class "caption-content" ]
                     [ div [ class "photo-stats" ]
-                        [ strong [] [ text (toString post.likes) ]
+                        [ strong [] [ text <| toString post.likes ]
                         , text " likes, "
-                        , a (clickTo (State.toURL (Photo post.id)) [])
-                            [ strong [] [ text (toString post.comments) ]
+                        , a (clickTo (State.toUrl <| Photo post.id) [])
+                            [ strong [] [ text <| toString post.comments ]
                             , text " comments"
                             ]
                         ]
@@ -119,28 +120,33 @@ viewPost model post =
 
 viewKeyedPost : Model -> Post -> ( String, Html Msg )
 viewKeyedPost model post =
-    ( post.id, (viewPost model post) )
+    ( post.id
+    , viewPost model post
+    )
 
 
 viewComments : Model -> Post -> Html Msg
 viewComments model post =
     let
         listOfComments =
-            List.indexedMap (viewComment post) (getPostComments post.id model.comments)
+            List.indexedMap (viewComment post) <|
+                getPostComments post.id model.comments
     in
         Html.Keyed.node "div"
             [ class "comments" ]
-            (listOfComments ++ [ (viewCommentsForm model post) ])
+        <|
+            listOfComments
+                ++ [ viewCommentsForm model post ]
 
 
 viewComment : Post -> Int -> Comment -> ( String, Html Msg )
 viewComment post index comment =
-    ( (toString index)
+    ( toString index
     , div [ class "comment" ]
         [ p []
             [ strong [] [ text comment.username ]
             , text comment.text
-            , button [ onClick (RemoveComment post.id index), class "remove-comment" ] [ text "×" ]
+            , button [ onClick <| RemoveComment post.id index, class "remove-comment" ] [ text "×" ]
             ]
         ]
     )
@@ -149,23 +155,23 @@ viewComment post index comment =
 viewCommentsForm : Model -> Post -> ( String, Html Msg )
 viewCommentsForm model post =
     ( "comment-form"
-    , Html.form [ onSubmit (AddComment post.id model.newComment), class "comment-form" ]
+    , Html.form [ onSubmit <| AddComment post.id model.newComment, class "comment-form" ]
         [ input
-            [ type' "text"
+            [ type_ "text"
             , value model.newComment.username
             , onInput UpdateCommentUsername
             , placeholder "author..."
             ]
             []
         , input
-            [ type' "text"
+            [ type_ "text"
             , value model.newComment.text
             , onInput UpdateCommentText
             , placeholder "comment..."
             ]
             []
         , input
-            [ type' "submit"
+            [ type_ "submit"
             , hidden True
             ]
             []

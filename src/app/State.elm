@@ -1,6 +1,5 @@
 module State exposing (..)
 
-import String
 import Dict exposing (Dict)
 import List.Extra
 import Navigation
@@ -12,24 +11,25 @@ import Rest
 -- INIT
 
 
-init : Result String Page -> ( Model, Cmd Msg )
-init result =
-    let
-        model =
-            initialModel (pageFromResult result)
+init : Navigation.Location -> ( Model, Cmd Msg )
+init location =
+    case UrlParser.parsePath pageParser location of
+        Just Photos ->
+            initialModel Photos
+                ! [ Rest.getPosts
+                  ]
 
-        getCommentsCommand =
-            case model.page of
-                Photo postId ->
-                    Rest.getPostComments postId
+        Just (Photo postId) ->
+            initialModel (Photo postId)
+                ! [ Rest.getPosts
+                  , Rest.getPostComments postId
+                  ]
 
-                Photos ->
-                    Cmd.none
-    in
-        model
-            ! [ Rest.getPosts
-              , getCommentsCommand
-              ]
+        Nothing ->
+            initialModel Photos
+                ! [ Rest.getPosts
+                  , Navigation.modifyUrl (toUrl Photos)
+                  ]
 
 
 
@@ -39,26 +39,44 @@ init result =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update action model =
     case action of
-        FetchPostsSuccess posts ->
-            { model | posts = posts } ! []
+        FetchPosts (Ok posts) ->
+            { model | posts = posts }
+                ! []
 
-        FetchPostsFail _ ->
-            model ! []
+        FetchPosts (Err _) ->
+            model
+                ! []
 
-        FetchCommentsSuccess postId comments ->
+        FetchComments postId (Ok comments) ->
             { model
                 | comments = Dict.insert postId comments model.comments
-                , posts = List.map (setPostComments postId (List.length comments)) model.posts
+                , posts = List.map (setPostComments postId <| List.length comments) model.posts
             }
                 ! []
 
-        FetchCommentsFail postId _ ->
-            update (FetchCommentsSuccess postId []) model
+        FetchComments postId (Err _) ->
+            update (FetchComments postId <| Ok []) model
 
         NavigateTo path ->
             model
                 ! [ Navigation.newUrl path
                   ]
+
+        NavigatedTo maybePage ->
+            case maybePage of
+                Just Photos ->
+                    { model | page = Photos }
+                        ! []
+
+                Just (Photo postId) ->
+                    { model | page = Photo postId }
+                        ! [ Rest.getPostComments postId
+                          ]
+
+                Nothing ->
+                    model
+                        ! [ Navigation.newUrl <| toUrl Photos
+                          ]
 
         IncrementLikes postId ->
             let
@@ -100,7 +118,7 @@ update action model =
                 addPostComment comments =
                     case comments of
                         Just comments ->
-                            Just (comments ++ [ comment ])
+                            Just <| comments ++ [ comment ]
 
                         Nothing ->
                             Just [ comment ]
@@ -110,7 +128,7 @@ update action model =
             in
                 { model
                     | comments = Dict.update postId addPostComment model.comments
-                    , posts = List.map (setPostComments postId (numberOfPostComments + 1)) model.posts
+                    , posts = List.map (setPostComments postId <| numberOfPostComments + 1) model.posts
                     , newComment = Comment "" ""
                 }
                     ! []
@@ -121,7 +139,7 @@ update action model =
                 removePostComment comments =
                     case comments of
                         Just comments ->
-                            Just (List.Extra.removeAt index comments)
+                            Just <| List.Extra.removeAt index comments
 
                         Nothing ->
                             Nothing
@@ -131,7 +149,7 @@ update action model =
             in
                 { model
                     | comments = Dict.update postId removePostComment model.comments
-                    , posts = List.map (setPostComments postId (numberOfPostComments - 1)) model.posts
+                    , posts = List.map (setPostComments postId <| numberOfPostComments - 1) model.posts
                 }
                     ! []
 
@@ -155,63 +173,30 @@ getNumberOfPostComments postId comments =
 
 
 
--- URL UPDATE
+-- URL PARSER
 
 
-urlUpdate : Result String Page -> Model -> ( Model, Cmd Msg )
-urlUpdate result model =
-    let
-        page =
-            pageFromResult result
-
-        command =
-            case page of
-                Photo postId ->
-                    Rest.getPostComments postId
-
-                Photos ->
-                    Cmd.none
-    in
-        { model
-            | page = page
-        }
-            ! [ command ]
-
-
-pageFromResult : Result String Page -> Page
-pageFromResult result =
-    case result of
-        Ok page ->
-            page
-
-        Err _ ->
-            Photos
-
-
-toURL : Page -> String
-toURL page =
-    let
-        baseUrl =
+toUrl : Page -> String
+toUrl page =
+    case page of
+        Photos ->
             "/"
-    in
-        case page of
-            Photos ->
-                baseUrl
 
-            Photo postId ->
-                baseUrl ++ "view/" ++ postId
+        Photo postId ->
+            "/view/" ++ postId
 
 
-pathParser : Navigation.Location -> Result String Page
+pathParser : Navigation.Location -> Msg
 pathParser location =
-    UrlParser.parse identity pageParser (String.dropLeft 1 location.pathname)
+    NavigatedTo <|
+        UrlParser.parsePath pageParser location
 
 
 pageParser : Parser (Page -> a) a
 pageParser =
     oneOf
-        [ format Photos (s "")
-        , format Photo (s "view" </> string)
+        [ map Photos <| s ""
+        , map Photo <| s "view" </> string
         ]
 
 
