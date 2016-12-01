@@ -1,14 +1,26 @@
 module Types exposing (..)
 
+import Http
+
 
 type alias Model =
-    Int
+    { posts : List Post
+    }
 
 
 initialModel : Model
 initialModel =
-    0
+    Model []
 
 
 type Msg
-    = IncrementLikes
+    = FetchPosts (Result Http.Error (List Post))
+
+
+type alias Post =
+    { id : String
+    , likes : Int
+    , comments : Int
+    , text : String
+    , media : String
+    }

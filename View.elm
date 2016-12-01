@@ -9,8 +9,5 @@ rootView : Model -> Html Msg
 rootView model =
     div []
         [ h1 [] [text "Elmstagram"]
-        , p [] [text ("Likes: " ++ toString model)]
-        , p []
-            [ button [onClick IncrementLikes] [text "Like!"]
-            ]
+        , p [] [text ("Posts: " ++ (toString <| List.length model.posts))]
         ]
