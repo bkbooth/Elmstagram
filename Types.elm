@@ -15,6 +15,7 @@ initialModel =
 
 type Msg
     = FetchPosts (Result Http.Error (List Post))
+    | IncrementLikes String
 
 
 type alias Post =

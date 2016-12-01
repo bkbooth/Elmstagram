@@ -18,6 +18,19 @@ update msg model =
         FetchPosts (Err _) ->
             model ! []
 
+        IncrementLikes postId ->
+            let
+                incrementPostLikes : String -> Post -> Post
+                incrementPostLikes postId post =
+                    if post.id == postId then
+                       { post | likes = post.likes + 1 }
+                    else
+                       post
+            in
+               { model
+                   | posts = List.map (incrementPostLikes postId) model.posts
+               } ! []
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =

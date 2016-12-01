@@ -45,7 +45,7 @@ viewPost model post =
             ]
         , figcaption []
             [ div [ class "caption-button" ]
-                [ button [ class "like-button" ] [ text "♡" ]
+                [ button [ onClick <| IncrementLikes post.id, class "like-button" ] [ text "♡" ]
                 ]
             , div [ class "caption-content" ]
                 [ div [ class "photo-stats" ]
