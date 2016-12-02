@@ -5,17 +5,24 @@ import Http
 
 type alias Model =
     { posts : List Post
+    , page : Page
     }
 
 
-initialModel : Model
-initialModel =
-    Model []
+initialModel : Page -> Model
+initialModel page =
+    Model [] page
 
 
 type Msg
     = FetchPosts (Result Http.Error (List Post))
+    | NavigatedTo (Maybe Page)
     | IncrementLikes String
+
+
+type Page
+    = ListOfPosts
+    | SinglePost String
 
 
 type alias Post =
