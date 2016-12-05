@@ -43,8 +43,22 @@ viewPage model =
                 <| List.map (viewKeyedPost model) model.posts
 
         SinglePost postId ->
-            div [ class "photo-single" ]
-                [ text ("Post: " ++ postId) ]
+            case getPost postId model.posts of
+                Just post ->
+                    div [ class "photo-single" ]
+                        [ viewPost model post ]
+
+                Nothing ->
+                    div []
+                        [ text ("Post \"" ++ postId ++ "\" not found.") ]
+
+
+getPost : String -> List Post -> Maybe Post
+getPost postId posts =
+    let
+        postsById = List.filter (\post -> post.id == postId) posts
+    in
+        List.head postsById
 
 
 viewPost : Model -> Post -> Html Msg
