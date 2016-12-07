@@ -18,7 +18,7 @@ rootView model =
             ]
         , nav []
             [ div [ class "nav-inner" ]
-                [ a (clickTo (State.toUrl Photos) [ class "nav-logo" ])
+                [ a (clickTo (State.toUrl ListOfPosts) [ class "nav-logo" ])
                     [ img [ src "img/logo.svg" ] []
                     , text "Elmstagram"
                     ]
@@ -33,7 +33,7 @@ rootView model =
                     , text "|"
                     , a [ href "https://github.com/bkbooth/Elmstagram.git" ] [ text "View Source" ]
                     , text "|"
-                    , a (clickTo (State.toUrl Photos) []) [ text "Elmstagram" ]
+                    , a (clickTo (State.toUrl ListOfPosts) []) [ text "Elmstagram" ]
                     ]
                 ]
             ]
@@ -43,13 +43,13 @@ rootView model =
 viewPage : Model -> Html Msg
 viewPage model =
     case model.page of
-        Photos ->
+        ListOfPosts ->
             Html.Keyed.node "div"
                 [ class "photo-list" ]
             <|
                 List.map (viewKeyedPost model) model.posts
 
-        Photo postId ->
+        SinglePost postId ->
             let
                 maybePost =
                     getPost postId model.posts
@@ -61,7 +61,9 @@ viewPage model =
                             ]
 
                     Nothing ->
-                        div [] []
+                        div []
+                            [ text ("Post \"" ++ postId ++ "\" not found.")
+                            ]
 
 
 getPost : String -> List Post -> Maybe Post
@@ -88,15 +90,15 @@ viewPost model post =
     let
         displayComments =
             case model.page of
-                Photo postId ->
+                SinglePost postId ->
                     viewComments model post
 
-                Photos ->
+                ListOfPosts ->
                     div [] []
     in
         figure [ class "photo-figure" ]
             [ div [ class "photo-wrap" ]
-                [ a (clickTo (State.toUrl <| Photo post.id) [])
+                [ a (clickTo (State.toUrl <| SinglePost post.id) [])
                     [ img [ src post.media, alt post.text, class "photo" ] []
                     ]
                 ]
@@ -108,7 +110,7 @@ viewPost model post =
                     [ div [ class "photo-stats" ]
                         [ strong [] [ text <| toString post.likes ]
                         , text " likes, "
-                        , a (clickTo (State.toUrl <| Photo post.id) [])
+                        , a (clickTo (State.toUrl <| SinglePost post.id) [])
                             [ strong [] [ text <| toString post.comments ]
                             , text " comments"
                             ]
@@ -123,7 +125,7 @@ viewPost model post =
             ]
 
 
-viewKeyedPost : Model -> Post -> ( String, Html Msg )
+viewKeyedPost : Model -> Post -> (String, Html Msg)
 viewKeyedPost model post =
     ( post.id
     , viewPost model post
@@ -141,10 +143,10 @@ viewComments model post =
             [ class "comments" ]
         <|
             listOfComments
-                ++ [ viewCommentsForm model post ]
+                ++ [ viewCommentForm model post ]
 
 
-viewComment : Post -> Int -> Comment -> ( String, Html Msg )
+viewComment : Post -> Int -> Comment -> (String, Html Msg)
 viewComment post index comment =
     ( toString index
     , div [ class "comment" ]
@@ -157,8 +159,8 @@ viewComment post index comment =
     )
 
 
-viewCommentsForm : Model -> Post -> ( String, Html Msg )
-viewCommentsForm model post =
+viewCommentForm : Model -> Post -> (String, Html Msg)
+viewCommentForm model post =
     ( "comment-form"
     , Html.form [ onSubmit <| AddComment post.id model.newComment, class "comment-form" ]
         [ input

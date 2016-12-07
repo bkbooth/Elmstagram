@@ -11,24 +11,24 @@ import Rest
 -- INIT
 
 
-init : Navigation.Location -> ( Model, Cmd Msg )
+init : Navigation.Location -> (Model, Cmd Msg)
 init location =
     case UrlParser.parsePath pageParser location of
-        Just Photos ->
-            initialModel Photos
+        Just ListOfPosts ->
+            initialModel ListOfPosts
                 ! [ Rest.getPosts
                   ]
 
-        Just (Photo postId) ->
-            initialModel (Photo postId)
+        Just (SinglePost postId) ->
+            initialModel (SinglePost postId)
                 ! [ Rest.getPosts
                   , Rest.getPostComments postId
                   ]
 
         Nothing ->
-            initialModel Photos
+            initialModel ListOfPosts
                 ! [ Rest.getPosts
-                  , Navigation.modifyUrl (toUrl Photos)
+                  , Navigation.modifyUrl (toUrl ListOfPosts)
                   ]
 
 
@@ -36,9 +36,9 @@ init location =
 -- UPDATE
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update action model =
-    case action of
+update : Msg -> Model -> (Model, Cmd Msg)
+update msg model =
+    case msg of
         FetchPosts (Ok posts) ->
             { model | posts = posts }
                 ! []
@@ -48,11 +48,17 @@ update action model =
                 ! []
 
         FetchComments postId (Ok comments) ->
-            { model
-                | comments = Dict.insert postId comments model.comments
-                , posts = List.map (setPostComments postId <| List.length comments) model.posts
-            }
-                ! []
+            case Dict.get postId model.comments of
+                Just existingComments ->
+                    model
+                        ! []
+
+                Nothing ->
+                    { model
+                        | comments = Dict.insert postId comments model.comments
+                        , posts = List.map (setPostComments postId <| List.length comments) model.posts
+                    }
+                        ! []
 
         FetchComments postId (Err _) ->
             update (FetchComments postId <| Ok []) model
@@ -64,18 +70,18 @@ update action model =
 
         NavigatedTo maybePage ->
             case maybePage of
-                Just Photos ->
-                    { model | page = Photos }
+                Just ListOfPosts ->
+                    { model | page = ListOfPosts }
                         ! []
 
-                Just (Photo postId) ->
-                    { model | page = Photo postId }
+                Just (SinglePost postId) ->
+                    { model | page = SinglePost postId }
                         ! [ Rest.getPostComments postId
                           ]
 
                 Nothing ->
                     model
-                        ! [ Navigation.newUrl <| toUrl Photos
+                        ! [ Navigation.newUrl <| toUrl ListOfPosts
                           ]
 
         IncrementLikes postId ->
@@ -179,10 +185,10 @@ getNumberOfPostComments postId comments =
 toUrl : Page -> String
 toUrl page =
     case page of
-        Photos ->
+        ListOfPosts ->
             "/"
 
-        Photo postId ->
+        SinglePost postId ->
             "/view/" ++ postId
 
 
@@ -195,8 +201,8 @@ pathParser location =
 pageParser : Parser (Page -> a) a
 pageParser =
     oneOf
-        [ map Photos <| s ""
-        , map Photo <| s "view" </> string
+        [ map ListOfPosts <| s ""
+        , map SinglePost <| s "view" </> string
         ]
 
 

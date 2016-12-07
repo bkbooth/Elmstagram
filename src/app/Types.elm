@@ -30,8 +30,8 @@ type Msg
 
 
 type Page
-    = Photos
-    | Photo String
+    = ListOfPosts
+    | SinglePost String
 
 
 type alias Post =
