@@ -135,6 +135,7 @@ viewComment post index comment =
         [ p []
             [ strong [] [ text comment.username ]
             , text comment.text
+            , button [ onClick <| RemoveComment post.id index, class "remove-comment" ] [ text "×" ]
             ]
         ]
     )

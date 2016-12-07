@@ -21,6 +21,7 @@ type Msg
     | FetchComments String (Result Http.Error (List Comment))
     | NavigatedTo (Maybe Page)
     | IncrementLikes String
+    | RemoveComment String Int
 
 
 type Page

@@ -1,6 +1,7 @@
 module State exposing (..)
 
 import Dict exposing (Dict)
+import List.Extra
 import Navigation
 import UrlParser exposing (..)
 import Types exposing (..)
@@ -38,10 +39,15 @@ update msg model =
             model ! []
 
         FetchComments postId (Ok comments) ->
-            { model
-                | comments = Dict.insert postId comments model.comments
-                , posts = List.map (setPostComments postId <| List.length comments) model.posts
-            } ! []
+            case Dict.get postId model.comments of
+                Just existingComments ->
+                    model ! []
+
+                Nothing ->
+                    { model
+                        | comments = Dict.insert postId comments model.comments
+                        , posts = List.map (setPostComments postId <| List.length comments) model.posts
+                    } ! []
 
         FetchComments postId (Err _) ->
             update (FetchComments postId <| Ok []) model
@@ -75,6 +81,25 @@ update msg model =
                    | posts = List.map (incrementPostLikes postId) model.posts
                } ! []
 
+        RemoveComment postId index ->
+            let
+                removePostComment : Maybe (List Comment) -> Maybe (List Comment)
+                removePostComment comments =
+                    case comments of
+                        Just comments ->
+                            Just <| List.Extra.removeAt index comments
+
+                        Nothing ->
+                            Nothing
+
+                numberOfPostComments =
+                    getNumberOfPostComments postId model.comments
+            in
+                { model
+                    | comments = Dict.update postId removePostComment model.comments
+                    , posts = List.map (setPostComments postId <| numberOfPostComments - 1) model.posts
+                } ! []
+
 
 setPostComments : String -> Int -> Post -> Post
 setPostComments postId numberOfComments post =
@@ -82,6 +107,16 @@ setPostComments postId numberOfComments post =
         { post | comments = numberOfComments }
     else
         post
+
+
+getNumberOfPostComments : String -> Dict String (List Comment) -> Int
+getNumberOfPostComments postId comments =
+    case Dict.get postId comments of
+        Just postComments ->
+            List.length postComments
+
+        Nothing ->
+            0
 
 
 hashParser : Navigation.Location -> Msg
