@@ -11,6 +11,8 @@ Related articles here:
 
 Preview available here: [elmstagram.bkbooth.me](http://elmstagram.bkbooth.me)
 
+A big shout out to my friend Sam Gates for letting me use data from his [@wollongong_rips](https://www.instagram.com/wollongong_rips/) account for this example app and articles.
+
 ## Build & Run
 
 ```bash
