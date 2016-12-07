@@ -1,7 +1,7 @@
 module View exposing (..)
 
 import Html exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Html.Attributes exposing (..)
 import Html.Keyed
 import Dict exposing (Dict)
@@ -126,6 +126,7 @@ viewComments model post =
         Html.Keyed.node "div"
             [ class "comments" ] <|
             listOfComments
+                ++ [ viewCommentForm model post ]
 
 
 viewComment : Post -> Int -> Comment -> (String, Html Msg)
@@ -137,5 +138,32 @@ viewComment post index comment =
             , text comment.text
             , button [ onClick <| RemoveComment post.id index, class "remove-comment" ] [ text "×" ]
             ]
+        ]
+    )
+
+
+viewCommentForm : Model -> Post -> (String, Html Msg)
+viewCommentForm model post =
+    ( "comment-form"
+    , Html.form [ onSubmit <| AddComment post.id model.newComment, class "comment-form" ]
+        [ input
+            [ type_ "text"
+            , value model.newComment.username
+            , onInput UpdateCommentUsername
+            , placeholder "author..."
+            ]
+            []
+        , input
+            [ type_ "text"
+            , value model.newComment.text
+            , onInput UpdateCommentText
+            , placeholder "comment..."
+            ]
+            []
+        , input
+            [ type_ "submit"
+            , hidden True
+            ]
+            []
         ]
     )

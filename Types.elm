@@ -8,12 +8,13 @@ type alias Model =
     { posts : List Post
     , comments : Dict String (List Comment)
     , page : Page
+    , newComment : Comment
     }
 
 
 initialModel : Page -> Model
 initialModel page =
-    Model [] Dict.empty page
+    Model [] Dict.empty page (Comment "" "")
 
 
 type Msg
@@ -21,6 +22,9 @@ type Msg
     | FetchComments String (Result Http.Error (List Comment))
     | NavigatedTo (Maybe Page)
     | IncrementLikes String
+    | UpdateCommentUsername String
+    | UpdateCommentText String
+    | AddComment String Comment
     | RemoveComment String Int
 
 

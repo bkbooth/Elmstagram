@@ -81,6 +81,42 @@ update msg model =
                    | posts = List.map (incrementPostLikes postId) model.posts
                } ! []
 
+        UpdateCommentUsername username ->
+            let
+                comment = model.newComment
+            in
+                { model
+                    | newComment = { comment | username = username }
+                } ! []
+
+        UpdateCommentText text ->
+            let
+                comment = model.newComment
+            in
+                { model
+                    | newComment = { comment | text = text }
+                } ! []
+
+        AddComment postId comment ->
+            let
+                addPostComment : Maybe (List Comment) -> Maybe (List Comment)
+                addPostComment comments =
+                    case comments of
+                        Just comments ->
+                            Just <| comments ++ [ comment ]
+
+                        Nothing ->
+                            Just [ comment ]
+
+                numberOfPostComments =
+                    getNumberOfPostComments postId model.comments
+            in
+                { model
+                    | comments = Dict.update postId addPostComment model.comments
+                    , posts = List.map (setPostComments postId <| numberOfPostComments + 1) model.posts
+                    , newComment = Comment "" ""
+                } ! []
+
         RemoveComment postId index ->
             let
                 removePostComment : Maybe (List Comment) -> Maybe (List Comment)
