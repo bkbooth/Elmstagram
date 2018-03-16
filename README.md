@@ -5,11 +5,11 @@ A basic UI-clone of [Instagram][] using [Elm][].
 Inspired by [Wes Bos'](https://twitter.com/wesbos) great [Redux course](https://learnredux.com/).
 
 Related articles here:
- * [Building a basic UI-clone of Instagram using Elm - Part 1](https://bkbooth.me/building-a-basic-ui-clone-of-instagram-using-elm-part-1/)
- * [Part 2](https://bkbooth.me/building-a-basic-ui-clone-of-instagram-using-elm-part-2/)
- * [Part 3](https://bkbooth.me/building-a-basic-ui-clone-of-instagram-using-elm-part-3/)
+ * [Building a basic UI-clone of Instagram using Elm - Part 1](https://benbooth.co/building-a-basic-ui-clone-of-instagram-using-elm-part-1/)
+ * [Part 2](https://benbooth.co/building-a-basic-ui-clone-of-instagram-using-elm-part-2/)
+ * [Part 3](https://benbooth.co/building-a-basic-ui-clone-of-instagram-using-elm-part-3/)
 
-Preview available here: [elmstagram.bkbooth.me](http://elmstagram.bkbooth.me)
+Preview available here: [elmstagram.benbooth.co](http://elmstagram.benbooth.co)
 
 A big shout out to my friend Sam Gates for letting me use data from his [@wollongong_rips](https://www.instagram.com/wollongong_rips/) account for this example app and articles.
 
