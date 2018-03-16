@@ -35,6 +35,9 @@ module.exports = function(options) {
           from: path.join(options.paths.src, 'data'),
           to: 'data',
         },
+        {
+          from: path.join(options.paths.src, 'public'),
+        },
       ]),
 
       new ExtractTextPlugin({
