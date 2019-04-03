@@ -1,55 +1,74 @@
 'use strict';
 
 const path = require('path');
-const webpack = require('webpack');
 const merge = require('webpack-merge');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
+const CopyPlugin = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const { options, config: commonConfig } = require('./webpack.common');
 
-module.exports = function(options) {
-  const commonConfig = require('./webpack.common')(options);
+module.exports = merge(commonConfig, {
+  mode: 'production',
+  devtool: 'source-map',
 
-  return merge(commonConfig, {
-    devtool: 'source-map',
+  module: {
+    rules: [
+      {
+        test: /\.s?css$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: { sourceMap: true, importLoaders: 1 },
+          },
+          'postcss-loader',
+          {
+            loader: 'sass-loader',
+            options: { sourceMap: true },
+          },
+        ],
+      },
+    ],
+  },
 
-    module: {
-      rules: [
-        {
-          test: /\.s?css$/,
-          loader: ExtractTextPlugin.extract({
-            fallbackLoader: 'style-loader',
-            loader: 'css-loader?sourceMap&importLoaders=1!postcss-loader!sass-loader?sourceMap',
-          }),
-        },
-      ]
-    },
+  plugins: [
+    new CopyPlugin([
+      {
+        from: path.join(options.paths.src, 'img'),
+        to: 'img',
+      },
+      {
+        from: path.join(options.paths.src, 'data'),
+        to: 'data',
+      },
+      {
+        from: path.join(options.paths.src, 'public'),
+      },
+    ]),
 
-    plugins: [
-      new CopyWebpackPlugin([
-        {
-          from: path.join(options.paths.src, 'img'),
-          to: 'img',
-        },
-        {
-          from: path.join(options.paths.src, 'data'),
-          to: 'data',
-        },
-        {
-          from: path.join(options.paths.src, 'public'),
-        },
-      ]),
+    new MiniCssExtractPlugin({ filename: '[name].[hash].bundle.css' }),
+  ],
 
-      new ExtractTextPlugin({
-        filename: '[name].[hash].bundle.css',
-        allChunks: true,
-      }),
-
+  optimization: {
+    minimizer: [
       new UglifyJsPlugin({
-        minimize: true,
-        compressor: { warnings: false },
-        mangle: true,
+        uglifyOptions: {
+          minimize: true,
+          compressor: { warnings: false },
+          mangle: true,
+        },
       }),
-    ]
-  });
-};
+    ],
+
+    splitChunks: {
+      cacheGroups: {
+        styles: {
+          name: 'styles',
+          test: /\.css$/,
+          chunks: 'all',
+          enforce: true,
+        },
+      },
+    },
+  },
+});
