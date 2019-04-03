@@ -1,8 +1,8 @@
-# Clean URLs for SPA
-/* /index.html 200
-
 # Redirect domain aliases to primary domain
 https://elmstagram.benbooth.co/* https://elmstagram.benbooth.dev/:splat 301!
 
 # Optional: Redirect default Netlify subdomain to primary domain
 https://elmstagram.netlify.com/* https://elmstagram.benbooth.dev/:splat 301!
+
+# Clean URLs for SPA
+/* /index.html 200
