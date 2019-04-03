@@ -29,7 +29,7 @@ rootView model =
                 [ p []
                     [ a [ href "https://twitter.com/bkbooth11" ] [ text "Ben Booth" ]
                     , text "|"
-                    , a [ href "https://www.instagram.com/wollongong_rips/" ] [ text "@wollongong_rips" ]
+                    , a [ href "https://www.instagram.com/samgatesphotography/" ] [ text "@samgatesphotography" ]
                     , text "|"
                     , a [ href "https://github.com/bkbooth/Elmstagram.git" ] [ text "View Source" ]
                     , text "|"
@@ -116,7 +116,7 @@ viewPost model post =
                             ]
                         ]
                     , p [ class "photo-caption" ]
-                        [ strong [] [ text "wollongong_rips" ]
+                        [ strong [] [ text "samgatesphotography" ]
                         , text post.text
                         ]
                     , displayComments
