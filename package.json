@@ -31,6 +31,11 @@
     "webpack-dev-server": "^3.2.1",
     "webpack-merge": "^4.2.1"
   },
+  "resolutions": {
+    "cryptiles": "^4.1.2",
+    "hoek": "^4.2.1",
+    "tunnel-agent": "^0.6.0"
+  },
   "engines": {
     "node": ">= 6.0.0"
   }
